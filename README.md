@@ -16,14 +16,14 @@ npm run build    # output: dist/rowreps/browser
 - `main` is production. Nobody pushes to it directly; changes land through pull requests.
 - Work on `feature/<name>` or `fix/<name>` branches.
 
-## Deploy (Cloudflare Pages)
+## Deploy (Cloudflare Workers)
 
-Cloudflare Pages is connected to this repo and builds on every push:
+Cloudflare Workers Builds is connected to this repo and builds on every push. `wrangler.jsonc` serves `dist/rowreps/browser` as static assets.
 
 - `main` → production, served on the custom domain.
-- Any other branch → its own preview URL, e.g. `feature/login` → `https://feature-login.rowreps.pages.dev`.
+- Any other branch → its own preview URL.
 
-Build settings: framework preset **Angular**, build command `npm run build`, output directory `dist/rowreps/browser`.
+Build settings: build command `npm run build`, deploy command `npx wrangler deploy`, non-production deploy command `npx wrangler versions upload`, root directory `/`.
 
 ## Claude Code
 

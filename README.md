@@ -23,7 +23,7 @@ Cloudflare Workers Builds is connected to this repo and builds on every push. `w
 - `main` → production, served on the custom domain.
 - Any other branch → its own preview URL.
 
-Build settings: build command `npm run build`, deploy command `npx wrangler deploy`, non-production deploy command `npx wrangler versions upload`, root directory `/`.
+Build settings: build command `npm run build`, deploy command `npx wrangler deploy`, non-production deploy command `npx wrangler preview`, root directory `/`.
 
 ## Claude Code
 

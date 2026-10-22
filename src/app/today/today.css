@@ -11,20 +11,22 @@
 
 .date {
   margin: 0;
-  font: var(--tui-typography-body-s);
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   font-weight: 700;
   color: var(--tui-text-secondary);
 }
 
 h1 {
   margin: 0;
-  font: var(--tui-typography-heading-h4);
+  font-size: 1.75rem;
+  line-height: 2.25rem;
   font-weight: 800;
 }
 
 .hint {
   margin: 1rem 0.25rem 0;
-  font: var(--tui-typography-body-l);
+  font: var(--tui-typography-ui-l);
   color: var(--tui-text-secondary);
 }
 
@@ -43,15 +45,19 @@ h1 {
 
 .row {
   min-block-size: 4.5rem;
+  padding-block: 0;
   padding-inline: 1.25rem;
   background: var(--tui-background-base-alt);
 }
 
-.pill {
+.toolbar .pill {
   border-radius: 2rem;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
 }
 
 [tuiTitle] {
+  font: var(--tui-typography-ui-l);
   font-weight: 600;
 }
 
@@ -65,8 +71,10 @@ h1 {
   justify-content: flex-start;
   inline-size: 100%;
   margin-block-start: 0.75rem;
+  padding-inline: 1rem;
+  border-radius: 1rem;
   color: var(--tui-text-secondary);
-  font-weight: 400;
+  font: var(--tui-typography-ui-l);
 }
 
 .cdk-drag-preview {

@@ -78,11 +78,21 @@ describe('AddExercise', () => {
     expect(options()[0].textContent).toContain('Chest · Shoulders · Triceps');
   });
 
+  it('focuses the search input when the screen opens', async () => {
+    await vi.waitFor(() => expect(document.activeElement).toBe(element().querySelector('input')));
+  });
+
   it('filters by name, ignoring case', async () => {
     await search('SQU');
 
     expect(groups()).toEqual(['Quadriceps']);
     expect(optionNames()).toEqual([squat.name, gobletSquat.name]);
+  });
+
+  it('matches the start of each typed word, in any order', async () => {
+    await search('pr ben');
+
+    expect(optionNames()).toEqual([bench.name]);
   });
 
   it('says so when nothing matches', async () => {

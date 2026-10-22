@@ -27,11 +27,11 @@
   @for (group of groups(); track group.name) {
     <h2>{{ group.name }}</h2>
     <div class="card">
-      @for (exercise of group.exercises; track exercise.name) {
+      @for (exercise of group.exercises; track exercise.id) {
         <button tuiCell type="button" class="row" (click)="add(exercise)">
           <span tuiTitle>
             {{ exercise.name }}
-            <span tuiSubtitle>{{ exercise.muscles }}</span>
+            <span tuiSubtitle>{{ muscles(exercise) }}</span>
           </span>
         </button>
       }

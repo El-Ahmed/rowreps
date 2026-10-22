@@ -25,6 +25,16 @@ Cloudflare Workers Builds is connected to this repo and builds on every push. `w
 
 Build settings: build command `npm run build`, deploy command `npx wrangler deploy`, non-production deploy command `npx wrangler preview`, root directory `/`.
 
+## Exercise data
+
+The exercise list comes from [free-exercise-db](https://github.com/yuhonas/free-exercise-db) by [yuhonas](https://github.com/yuhonas), an open public domain dataset released under [The Unlicense](https://unlicense.org). Thank you!
+
+`public/free-exercise-db/exercises.json` is a copy of its [`dist/exercises.json`](https://github.com/yuhonas/free-exercise-db/blob/main/dist/exercises.json) (commit `f00c92c`), next to its `LICENSE.md`. To update it:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/dist/exercises.json -o public/free-exercise-db/exercises.json
+```
+
 ## Claude Code
 
 Mention `@claude` in an issue or pull request comment and Claude works on it, pushing to a branch and opening a PR.

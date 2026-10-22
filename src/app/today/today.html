@@ -23,7 +23,7 @@
     <p class="hint">What are you lifting today?</p>
   } @else if (editing()) {
     <ul class="card" cdkDropList aria-label="Today's exercises" (cdkDropListDropped)="drop($event)">
-      @for (exercise of exercises(); track exercise.name) {
+      @for (exercise of exercises(); track exercise.id) {
         <li class="row" tuiCell cdkDrag cdkDragLockAxis="y">
           <button
             tuiIconButton
@@ -42,7 +42,7 @@
     </ul>
   } @else {
     <ul class="card" aria-label="Today's exercises">
-      @for (exercise of exercises(); track exercise.name) {
+      @for (exercise of exercises(); track exercise.id) {
         <li>
           <tui-swipe-actions>
             <div class="row" tuiCell>

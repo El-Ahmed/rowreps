@@ -29,11 +29,7 @@
                 "output": "assets/taiga-ui/icons"
               }
             ],
-            "styles": [
-              "node_modules/@taiga-ui/styles/taiga-ui-theme.less",
-              "node_modules/@taiga-ui/styles/taiga-ui-fonts.less",
-              "src/styles.css"
-            ]
+            "styles": ["node_modules/@taiga-ui/styles/taiga-ui-theme.less", "src/styles.css"]
           },
           "configurations": {
             "production": {
@@ -72,7 +68,10 @@
           "defaultConfiguration": "development"
         },
         "test": {
-          "builder": "@angular/build:unit-test"
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "setupFiles": ["node_modules/fake-indexeddb/auto/index.mjs", "src/test-setup.ts"]
+          }
         }
       }
     }

@@ -2,8 +2,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { CdkDropList } from '@angular/cdk/drag-drop';
+import { TuiDay } from '@taiga-ui/cdk';
 import { Exercise } from '../exercises';
-import { TodayList } from '../today-list';
+import { Sessions } from '../sessions';
 import { Today } from './today';
 
 describe('Today', () => {
@@ -26,7 +27,7 @@ describe('Today', () => {
     secondaryMuscles: ['calves', 'glutes', 'hamstrings', 'lower back'],
   };
   let fixture: ComponentFixture<Today>;
-  let todayList: TodayList;
+  let sessions: Sessions;
 
   const element = () => fixture.nativeElement as HTMLElement;
   const names = () =>
@@ -39,45 +40,57 @@ describe('Today', () => {
     await fixture.whenStable();
   }
 
+  // Saves the exercises to today's session and waits for the list to show them.
+  async function plan(...exercises: Exercise[]): Promise<void> {
+    for (const exercise of exercises) {
+      await sessions.add(TuiDay.currentLocal().toJSON(), exercise);
+    }
+    await shows(exercises);
+  }
+
+  async function shows(exercises: Exercise[]): Promise<void> {
+    await vi.waitFor(async () => {
+      await render();
+      expect(names()).toEqual(exercises.map((exercise) => exercise.name));
+    });
+  }
+
   beforeEach(async () => {
     TestBed.configureTestingModule({ providers: [provideRouter([])] });
-    todayList = TestBed.inject(TodayList);
+    sessions = TestBed.inject(Sessions);
     fixture = TestBed.createComponent(Today);
-    await render();
+    await vi.waitFor(async () => {
+      await render();
+      expect(element().textContent).toContain('What are you lifting today?');
+    });
   });
 
   it('shows a prompt and the add button when nothing is planned', () => {
-    expect(element().textContent).toContain('What are you lifting today?');
     expect(element().querySelector('a[href="/add"]')?.textContent).toContain('Add exercise');
     expect(button('Edit')).toBeUndefined();
   });
 
-  it("lists today's exercises in order", async () => {
-    todayList.add(bench);
-    todayList.add(pullups);
-    await render();
+  it('links to the history', () => {
+    expect(element().querySelector('a[href="/history"]')?.textContent).toContain('History');
+  });
 
-    expect(names()).toEqual([bench.name, pullups.name]);
+  it("lists today's saved exercises in order", async () => {
+    await plan(bench, pullups);
+
     expect(element().textContent).not.toContain('What are you lifting today?');
   });
 
   it('deletes an exercise with its swipe action', async () => {
-    todayList.add(bench);
-    todayList.add(pullups);
-    await render();
+    await plan(bench, pullups);
 
     button(`Delete ${bench.name}`)?.click();
-    await render();
 
-    expect(names()).toEqual([pullups.name]);
+    await shows([pullups]);
   });
 
   describe('edit mode', () => {
     beforeEach(async () => {
-      todayList.add(bench);
-      todayList.add(pullups);
-      todayList.add(squat);
-      await render();
+      await plan(bench, pullups, squat);
       button('Edit')?.click();
       await render();
     });
@@ -89,26 +102,24 @@ describe('Today', () => {
 
     it('removes an exercise', async () => {
       button(`Remove ${pullups.name}`)?.click();
-      await render();
 
-      expect(names()).toEqual([bench.name, squat.name]);
+      await shows([bench, squat]);
     });
 
     it('reorders exercises when one is dropped in a new place', async () => {
       fixture.debugElement
         .query(By.directive(CdkDropList))
         .triggerEventHandler('cdkDropListDropped', { previousIndex: 0, currentIndex: 2 });
-      await render();
 
-      expect(names()).toEqual([pullups.name, squat.name, bench.name]);
+      await shows([pullups, squat, bench]);
     });
 
     it('leaves edit mode after the last exercise is removed', async () => {
-      for (const exercise of [bench, pullups, squat]) {
-        button(`Remove ${exercise.name}`)?.click();
-        await render();
-      }
+      button(`Remove ${bench.name}`)?.click();
+      button(`Remove ${pullups.name}`)?.click();
+      button(`Remove ${squat.name}`)?.click();
 
+      await shows([]);
       expect(button('Done')).toBeUndefined();
       expect(element().textContent).toContain('What are you lifting today?');
     });

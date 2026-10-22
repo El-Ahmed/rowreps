@@ -1,0 +1,38 @@
+<main class="screen">
+  <div class="toolbar">
+    <a
+      tuiIconButton
+      routerLink="/"
+      appearance="secondary-grayscale"
+      iconStart="@tui.chevron-left"
+      size="m"
+      class="round"
+    >
+      Back
+    </a>
+  </div>
+
+  <h1>History</h1>
+
+  @for (group of groups(); track group.name) {
+    <h2>{{ group.name }}</h2>
+    <ul class="card">
+      @for (session of group.sessions; track session.id) {
+        <li>
+          <a tuiCell class="row" [routerLink]="['/history', session.id]">
+            <span tuiTitle>
+              {{ session.date | date: 'EEE d MMM' }}
+              <span tuiSubtitle class="names">{{ names(session) }}</span>
+            </span>
+            <span class="count">{{ session.exercises.length | i18nPlural: lifts }}</span>
+            <tui-icon icon="@tui.chevron-right" class="chevron" />
+          </a>
+        </li>
+      }
+    </ul>
+  } @empty {
+    @if (loaded()) {
+      <p class="hint">No workouts yet. The exercises you add today show up here.</p>
+    }
+  }
+</main>

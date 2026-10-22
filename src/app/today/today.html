@@ -7,10 +7,22 @@
         appearance="secondary-grayscale"
         size="m"
         class="pill"
-        (click)="editing.set(!editing())"
+        (click)="editRequested.set(!editing())"
       >
         {{ editing() ? 'Done' : 'Edit' }}
       </button>
+    }
+    @if (!editing()) {
+      <a
+        tuiIconButton
+        routerLink="/history"
+        appearance="secondary-grayscale"
+        iconStart="@tui.history"
+        size="m"
+        class="round"
+      >
+        History
+      </a>
     }
   </div>
 
@@ -20,7 +32,9 @@
   </header>
 
   @if (!exercises().length) {
-    <p class="hint">What are you lifting today?</p>
+    @if (loaded()) {
+      <p class="hint">What are you lifting today?</p>
+    }
   } @else if (editing()) {
     <ul class="card" cdkDropList aria-label="Today's exercises" (cdkDropListDropped)="drop($event)">
       @for (exercise of exercises(); track exercise.id) {
@@ -64,7 +78,7 @@
     </ul>
   }
 
-  @if (!editing()) {
+  @if (loaded() && !editing()) {
     <a tuiButton routerLink="/add" appearance="secondary" iconStart="@tui.search" class="add">
       Add exercise
     </a>

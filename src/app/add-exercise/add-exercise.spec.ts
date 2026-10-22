@@ -2,8 +2,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Router, provideRouter } from '@angular/router';
+import { TuiDay } from '@taiga-ui/cdk';
+import { db } from '../db';
 import { Exercise } from '../exercises';
-import { TodayList } from '../today-list';
+import { Sessions } from '../sessions';
 import { AddExercise } from './add-exercise';
 
 describe('AddExercise', () => {
@@ -33,7 +35,8 @@ describe('AddExercise', () => {
   };
 
   let fixture: ComponentFixture<AddExercise>;
-  let todayList: TodayList;
+  let sessions: Sessions;
+  const today = () => TuiDay.currentLocal().toJSON();
 
   const element = () => fixture.nativeElement as HTMLElement;
   const groups = () => [...element().querySelectorAll('h2')].map((h) => h.textContent?.trim());
@@ -57,7 +60,7 @@ describe('AddExercise', () => {
     TestBed.configureTestingModule({
       providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     });
-    todayList = TestBed.inject(TodayList);
+    sessions = TestBed.inject(Sessions);
     fixture = TestBed.createComponent(AddExercise);
     TestBed.inject(HttpTestingController)
       .expectOne('free-exercise-db/exercises.json')
@@ -103,10 +106,12 @@ describe('AddExercise', () => {
   });
 
   it("hides exercises that are already in today's list", async () => {
-    todayList.add(bench);
-    await render();
+    await sessions.add(today(), bench);
 
-    expect(optionNames()).not.toContain(bench.name);
+    await vi.waitFor(async () => {
+      await render();
+      expect(optionNames()).not.toContain(bench.name);
+    });
   });
 
   it('adds the picked exercise to today and goes back', async () => {
@@ -114,7 +119,37 @@ describe('AddExercise', () => {
 
     options()[0].click();
 
-    expect(todayList.exercises()).toEqual([bench]);
-    expect(navigate).toHaveBeenCalledWith(['/']);
+    await vi.waitFor(() => expect(navigate).toHaveBeenCalledWith(['/']));
+    expect(await db.sessions.toArray()).toEqual([{ id: 1, date: today(), exercises: [bench] }]);
+  });
+
+  describe('for a past session', () => {
+    beforeEach(async () => {
+      await sessions.add('2026-10-19', squat);
+      fixture.componentRef.setInput('id', '1');
+      await vi.waitFor(async () => {
+        await render();
+        expect(element().querySelector('h1')?.textContent).toContain('Add to Mon 19 Oct');
+      });
+    });
+
+    it('hides the exercises already in that session', () => {
+      expect(optionNames()).toEqual([bench.name, pullups.name, gobletSquat.name]);
+    });
+
+    it('goes back to that session', () => {
+      expect(element().querySelector('a')?.getAttribute('href')).toBe('/history/1');
+    });
+
+    it('adds the picked exercise to that session and goes back to it', async () => {
+      const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+
+      options()[0].click();
+
+      await vi.waitFor(() => expect(navigate).toHaveBeenCalledWith(['/history', '1']));
+      expect(await db.sessions.toArray()).toEqual([
+        { id: 1, date: '2026-10-19', exercises: [squat, bench] },
+      ]);
+    });
   });
 });

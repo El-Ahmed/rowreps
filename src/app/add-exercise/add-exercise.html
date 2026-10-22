@@ -2,7 +2,7 @@
   <div class="toolbar">
     <a
       tuiIconButton
-      routerLink="/"
+      [routerLink]="back()"
       appearance="secondary-grayscale"
       iconStart="@tui.chevron-left"
       size="m"
@@ -12,7 +12,11 @@
     </a>
   </div>
 
-  <h1>Add exercise</h1>
+  @if (id()) {
+    <h1>Add to {{ session()?.date | date: 'EEE d MMM' }}</h1>
+  } @else {
+    <h1>Add exercise</h1>
+  }
 
   <tui-textfield iconStart="@tui.search" [tuiTextfieldCleaner]="true" class="search">
     <input

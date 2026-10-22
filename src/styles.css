@@ -1,3 +1,86 @@
+/* Manrope in every weight the design uses (Taiga's own font file only loads 500 and 800). */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap');
+
+/*
+ * RowReps colours from the design canvas, set on Taiga UI's theme variables so every
+ * Taiga component uses them. Taiga's own values for anything not listed here still apply.
+ */
+:root,
+[tuiTheme='light'] {
+  --tui-background-base: #ffffff;
+  --tui-background-base-alt: #f3f3f5;
+  --tui-background-neutral-1: #f3f3f5;
+  --tui-background-accent-1: #ffb800;
+  --tui-background-accent-1-hover: #ffc633;
+  --tui-background-accent-1-pressed: #e0a200;
+  --tui-border-normal: #e3e3e6;
+  --tui-status-negative: #d93025;
+  --tui-text-primary: #1a1a1a;
+  --tui-text-secondary: #6b6b6b;
+  --tui-text-primary-on-accent-1: #000000;
+  --tui-text-action: #8a6100;
+  --tui-text-action-hover: #6b4b00;
+  --tui-text-negative: #c5221f;
+  --tui-text-negative-hover: #a51c1a;
+}
+
+[tuiTheme='dark'] {
+  --tui-background-base: #222222;
+  --tui-background-base-alt: #333333;
+  --tui-background-neutral-1: #383838;
+  --tui-border-normal: #3d3d3d;
+  --tui-status-negative: #d93025;
+  --tui-text-primary: #f7f7f7;
+  --tui-text-secondary: #c3c3c3;
+  --tui-text-action: #ffb800;
+  --tui-text-action-hover: #ffc633;
+  --tui-text-negative: #ff6b61;
+  --tui-text-negative-hover: #ff8a82;
+}
+
+/*
+ * The design's type scale, set on Taiga UI's typography variables. Sizes keep Taiga's
+ * --tui-font-offset so they still follow the user's text size setting.
+ */
+:root {
+  --tui-typography-heading-h4: 800 calc(var(--tui-font-offset) + 1.75rem) / 2.25rem
+    var(--tui-typography-family-display); /* screen titles, 28/36 */
+  --tui-typography-heading-h5: 800 calc(var(--tui-font-offset) + 1.375rem) / 1.75rem
+    var(--tui-typography-family-display); /* sheet titles, 22/28 */
+  --tui-typography-heading-h6: 700 calc(var(--tui-font-offset) + 1.0625rem) / 1.5rem
+    var(--tui-typography-family-display); /* alert titles, 17/24 */
+  --tui-typography-body-l: 500 calc(var(--tui-font-offset) + 1.0625rem) / 1.5rem
+    var(--tui-typography-family-text); /* rows and prompts, 17/24 */
+  --tui-typography-body-m: 500 calc(var(--tui-font-offset) + 0.9375rem) / 1.5rem
+    var(--tui-typography-family-text); /* buttons and hints, 15/24 */
+  --tui-typography-body-s: 500 calc(var(--tui-font-offset) + 0.8125rem) / 1.25rem
+    var(--tui-typography-family-text); /* captions and section labels, 13/20 */
+  --tui-typography-body-xs: 500 calc(var(--tui-font-offset) + 0.75rem) / 1rem
+    var(--tui-typography-family-text); /* calendar weekdays, 12/16 */
+  --tui-typography-ui-l: 500 calc(var(--tui-font-offset) + 1.0625rem) / 1.5rem
+    var(--tui-typography-family-text);
+  --tui-typography-ui-m: 500 calc(var(--tui-font-offset) + 0.9375rem) / 1.5rem
+    var(--tui-typography-family-text);
+  --tui-typography-ui-s: 500 calc(var(--tui-font-offset) + 0.8125rem) / 1.25rem
+    var(--tui-typography-family-text);
+  --tui-typography-ui-xs: 500 calc(var(--tui-font-offset) + 0.75rem) / 1rem
+    var(--tui-typography-family-text);
+}
+
+/* Taiga titles small dialogs and sheets with the opposite sizes to the design. */
+tui-root tui-dialog[data-appearance~='taiga'][data-size='s'] > header {
+  font: var(--tui-typography-heading-h6);
+}
+
+tui-sheet-dialog[data-appearance] header {
+  font: var(--tui-typography-heading-h5);
+}
+
+/* The design shows weekends like any other day, not in red. */
+tui-calendar-sheet .t-cell[data-type='weekend'] {
+  color: var(--tui-text-primary);
+}
+
 body {
   margin: 0;
 }

@@ -2,7 +2,16 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  gap: 0.5rem;
   block-size: 3.5rem;
+}
+
+.round {
+  border-radius: 100%;
+}
+
+.round::before {
+  font-size: 1.25rem;
 }
 
 .heading {
@@ -11,23 +20,20 @@
 
 .date {
   margin: 0;
-  font-size: 0.8125rem;
-  line-height: 1.25rem;
+  font: var(--tui-typography-body-s);
   font-weight: 700;
   color: var(--tui-text-secondary);
 }
 
 h1 {
   margin: 0;
-  font-size: 1.75rem;
-  line-height: 2.25rem;
-  font-weight: 800;
+  font: var(--tui-typography-heading-h4);
 }
 
 .hint {
-  margin: 1rem 0.25rem 0;
-  font: var(--tui-typography-ui-l);
-  color: var(--tui-text-secondary);
+  margin: 0.75rem 0 0;
+  font: var(--tui-typography-heading-h5);
+  font-weight: 600;
 }
 
 .card {
@@ -52,8 +58,6 @@ h1 {
 
 .toolbar .pill {
   border-radius: 2rem;
-  font-size: 0.9375rem;
-  line-height: 1.5rem;
 }
 
 [tuiTitle] {

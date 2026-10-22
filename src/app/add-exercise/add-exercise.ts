@@ -3,6 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { TuiAutoFocus } from '@taiga-ui/cdk';
 import { TuiButton, TuiCell, TuiInput, TuiTitle } from '@taiga-ui/core';
 import { Exercise } from '../exercises';
 import { matchesSearch } from '../search';
@@ -13,7 +14,7 @@ const muscleGroup = (exercise: Exercise) => capitalize(exercise.primaryMuscles[0
 
 @Component({
   selector: 'app-add-exercise',
-  imports: [FormsModule, RouterLink, TuiButton, TuiCell, TuiInput, TuiTitle],
+  imports: [FormsModule, RouterLink, TuiAutoFocus, TuiButton, TuiCell, TuiInput, TuiTitle],
   templateUrl: './add-exercise.html',
   styleUrl: './add-exercise.css',
 })

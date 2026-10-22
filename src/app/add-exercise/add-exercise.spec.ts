@@ -85,6 +85,12 @@ describe('AddExercise', () => {
     expect(optionNames()).toEqual([squat.name, gobletSquat.name]);
   });
 
+  it('matches the start of each typed word, in any order', async () => {
+    await search('pr ben');
+
+    expect(optionNames()).toEqual([bench.name]);
+  });
+
   it('says so when nothing matches', async () => {
     await search('Belt squat');
 

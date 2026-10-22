@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { TuiButton, TuiCell, TuiInput, TuiTitle } from '@taiga-ui/core';
 import { Exercise } from '../exercises';
+import { matchesSearch } from '../search';
 import { TodayList } from '../today-list';
 
 const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
@@ -27,9 +28,9 @@ export class AddExercise {
   protected readonly query = signal('');
 
   protected readonly groups = computed(() => {
-    const query = this.query().trim().toLowerCase();
+    const query = this.query();
     const matches = this.exercises().filter(
-      (exercise) => !this.todayList.has(exercise) && exercise.name.toLowerCase().includes(query),
+      (exercise) => !this.todayList.has(exercise) && matchesSearch(exercise.name, query),
     );
     const names = [...new Set(matches.map(muscleGroup))].sort();
 

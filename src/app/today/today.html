@@ -1,0 +1,72 @@
+<main class="screen">
+  <div class="toolbar">
+    @if (exercises().length) {
+      <button
+        tuiButton
+        type="button"
+        appearance="secondary-grayscale"
+        size="m"
+        class="pill"
+        (click)="editing.set(!editing())"
+      >
+        {{ editing() ? 'Done' : 'Edit' }}
+      </button>
+    }
+  </div>
+
+  <header class="heading">
+    <p class="date">{{ date | date: 'EEEE d MMMM' }}</p>
+    <h1>Today</h1>
+  </header>
+
+  @if (!exercises().length) {
+    <p class="hint">What are you lifting today?</p>
+  } @else if (editing()) {
+    <ul class="card" cdkDropList aria-label="Today's exercises" (cdkDropListDropped)="drop($event)">
+      @for (exercise of exercises(); track exercise.name) {
+        <li class="row" tuiCell cdkDrag cdkDragLockAxis="y">
+          <button
+            tuiIconButton
+            type="button"
+            appearance="action-destructive"
+            size="s"
+            iconStart="@tui.circle-minus"
+            (click)="remove(exercise)"
+          >
+            Remove {{ exercise.name }}
+          </button>
+          <span tuiTitle>{{ exercise.name }}</span>
+          <tui-icon icon="@tui.grip-vertical" class="handle" cdkDragHandle />
+        </li>
+      }
+    </ul>
+  } @else {
+    <ul class="card" aria-label="Today's exercises">
+      @for (exercise of exercises(); track exercise.name) {
+        <li>
+          <tui-swipe-actions>
+            <div class="row" tuiCell>
+              <span tuiTitle>{{ exercise.name }}</span>
+            </div>
+            <button
+              tuiIconButton
+              tuiSwipeAction
+              type="button"
+              appearance="primary-destructive"
+              iconStart="@tui.trash-2"
+              (click)="remove(exercise)"
+            >
+              Delete {{ exercise.name }}
+            </button>
+          </tui-swipe-actions>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (!editing()) {
+    <a tuiButton routerLink="/add" appearance="secondary" iconStart="@tui.search" class="add">
+      Add exercise
+    </a>
+  }
+</main>

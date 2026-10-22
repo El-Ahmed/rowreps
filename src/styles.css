@@ -1,1 +1,12 @@
-/* You can add global styles to this file, and also import other style files */
+body {
+  margin: 0;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  max-inline-size: 30rem;
+  margin-inline: auto;
+  padding: 1rem 1rem 1.75rem;
+}

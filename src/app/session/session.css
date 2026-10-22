@@ -15,8 +15,6 @@
 
 .pill {
   border-radius: 2rem;
-  font-size: 0.9375rem;
-  line-height: 1.5rem;
 }
 
 .end {
@@ -29,9 +27,7 @@
 
 h1 {
   margin: 0;
-  font-size: 1.75rem;
-  line-height: 2.25rem;
-  font-weight: 800;
+  font: var(--tui-typography-heading-h4);
 }
 
 .names {
@@ -88,8 +84,7 @@ h1 {
 
 .date-hint {
   margin: 1rem 0.25rem;
-  font-size: 0.8125rem;
-  line-height: 1.25rem;
+  font: var(--tui-typography-body-s);
   color: var(--tui-text-secondary);
 }
 

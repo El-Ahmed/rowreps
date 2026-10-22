@@ -14,16 +14,13 @@
 
 h1 {
   margin: 0.5rem 0 0;
-  font-size: 1.75rem;
-  line-height: 2.25rem;
-  font-weight: 800;
+  font: var(--tui-typography-heading-h4);
 }
 
 h2 {
   margin: 1.5rem 0 0.5rem;
   padding-inline: 0.5rem;
-  font-size: 0.8125rem;
-  line-height: 1.25rem;
+  font: var(--tui-typography-body-s);
   font-weight: 700;
   color: var(--tui-text-secondary);
 }
@@ -57,15 +54,13 @@ h2 {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: 0.8125rem;
-  line-height: 1.25rem;
-  font-weight: 500;
+  font: var(--tui-typography-body-s);
 }
 
 .count {
   flex-shrink: 0;
   margin-inline-start: auto;
-  font-size: 0.9375rem;
+  font: var(--tui-typography-body-m);
   color: var(--tui-text-secondary);
 }
 

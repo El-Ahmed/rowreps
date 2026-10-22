@@ -1,23 +1,24 @@
 import { TestBed } from '@angular/core/testing';
-import { App } from './app';
+import { provideRouter } from '@angular/router';
+import { RouterTestingHarness } from '@angular/router/testing';
+import { routes } from './app.routes';
+import { Today } from './today/today';
+import { AddExercise } from './add-exercise/add-exercise';
 
-describe('App', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [App],
-    }).compileComponents();
+describe('routes', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({ providers: [provideRouter(routes)] });
   });
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(App);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
+  it('shows Today at the root', async () => {
+    const harness = await RouterTestingHarness.create();
+
+    expect(await harness.navigateByUrl('/', Today)).toBeInstanceOf(Today);
   });
 
-  it('should render title', async () => {
-    const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, rowreps');
+  it('shows the exercise picker at /add', async () => {
+    const harness = await RouterTestingHarness.create();
+
+    expect(await harness.navigateByUrl('/add', AddExercise)).toBeInstanceOf(AddExercise);
   });
 });

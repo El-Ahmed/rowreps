@@ -1,0 +1,56 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  block-size: 3.5rem;
+}
+
+.back {
+  border-radius: 100%;
+}
+
+h1 {
+  margin: 0.5rem 0 0;
+  font: var(--tui-typography-heading-h4);
+  font-weight: 800;
+}
+
+.search {
+  margin-block-start: 1rem;
+}
+
+h2 {
+  margin: 1.5rem 0 0.5rem;
+  padding-inline: 0.5rem;
+  font: var(--tui-typography-body-s);
+  font-weight: 700;
+  color: var(--tui-text-secondary);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  padding-block: 0.25rem;
+  border-radius: 1.5rem;
+  background: var(--tui-background-base-alt);
+}
+
+.row {
+  min-block-size: 4rem;
+  padding-inline: 1rem;
+  text-align: start;
+}
+
+[tuiTitle] {
+  font-weight: 600;
+}
+
+[tuiSubtitle] {
+  font-weight: 500;
+}
+
+.hint {
+  margin: 1.5rem 0 0.5rem;
+  padding-inline: 0.5rem;
+  font: var(--tui-typography-body-m);
+  color: var(--tui-text-secondary);
+}

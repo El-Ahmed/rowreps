@@ -1,0 +1,79 @@
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  block-size: 3.5rem;
+}
+
+.heading {
+  margin-block-start: 0.5rem;
+}
+
+.date {
+  margin: 0;
+  font: var(--tui-typography-body-s);
+  font-weight: 700;
+  color: var(--tui-text-secondary);
+}
+
+h1 {
+  margin: 0;
+  font: var(--tui-typography-heading-h4);
+  font-weight: 800;
+}
+
+.hint {
+  margin: 1rem 0.25rem 0;
+  font: var(--tui-typography-body-l);
+  color: var(--tui-text-secondary);
+}
+
+.card {
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  border-radius: 1.5rem;
+  background: var(--tui-background-base-alt);
+  overflow: hidden;
+}
+
+.card > * + * {
+  border-block-start: 1px solid var(--tui-border-normal);
+}
+
+.row {
+  min-block-size: 4.5rem;
+  padding-inline: 1.25rem;
+  background: var(--tui-background-base-alt);
+}
+
+.pill {
+  border-radius: 2rem;
+}
+
+[tuiTitle] {
+  font-weight: 600;
+}
+
+.handle {
+  margin-inline-start: auto;
+  color: var(--tui-text-secondary);
+  cursor: grab;
+}
+
+.add {
+  justify-content: flex-start;
+  inline-size: 100%;
+  margin-block-start: 0.75rem;
+  color: var(--tui-text-secondary);
+  font-weight: 400;
+}
+
+.cdk-drag-preview {
+  border-radius: 1rem;
+  box-shadow: var(--tui-shadow-medium);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}

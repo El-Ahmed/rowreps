@@ -1,0 +1,43 @@
+<main class="screen">
+  <div class="toolbar">
+    <a
+      tuiIconButton
+      routerLink="/"
+      appearance="secondary-grayscale"
+      iconStart="@tui.chevron-left"
+      class="back"
+    >
+      Back
+    </a>
+  </div>
+
+  <h1>Add exercise</h1>
+
+  <tui-textfield iconStart="@tui.search" [tuiTextfieldCleaner]="true" class="search">
+    <input
+      tuiInput
+      type="text"
+      placeholder="Search all exercises"
+      aria-label="Search all exercises"
+      [(ngModel)]="query"
+    />
+  </tui-textfield>
+
+  @for (group of groups(); track group.name) {
+    <h2>{{ group.name }}</h2>
+    <div class="card">
+      @for (exercise of group.exercises; track exercise.name) {
+        <button tuiCell type="button" class="row" (click)="add(exercise)">
+          <span tuiTitle>
+            {{ exercise.name }}
+            <span tuiSubtitle>{{ exercise.muscles }}</span>
+          </span>
+        </button>
+      }
+    </div>
+  } @empty {
+    @if (query().trim()) {
+      <p class="hint">No exercise called "{{ query().trim() }}" yet.</p>
+    }
+  }
+</main>

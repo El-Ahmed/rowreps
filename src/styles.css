@@ -1,3 +1,48 @@
+/* Manrope in every weight the design uses (Taiga's own font file only loads 500 and 800). */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap');
+
+/*
+ * RowReps colours from the design canvas, set on Taiga UI's theme variables so every
+ * Taiga component uses them. Taiga's own values for anything not listed here still apply.
+ */
+:root,
+[tuiTheme='light'] {
+  --tui-background-base: #ffffff;
+  --tui-background-base-alt: #f3f3f5;
+  --tui-background-neutral-1: #f3f3f5;
+  --tui-background-accent-1: #ffb800;
+  --tui-background-accent-1-hover: #ffc633;
+  --tui-background-accent-1-pressed: #e0a200;
+  --tui-border-normal: #e3e3e6;
+  --tui-status-negative: #d93025;
+  --tui-text-primary: #1a1a1a;
+  --tui-text-secondary: #6b6b6b;
+  --tui-text-primary-on-accent-1: #000000;
+  --tui-text-action: #8a6100;
+  --tui-text-action-hover: #6b4b00;
+  --tui-text-negative: #c5221f;
+  --tui-text-negative-hover: #a51c1a;
+}
+
+[tuiTheme='dark'] {
+  --tui-background-base: #222222;
+  --tui-background-base-alt: #333333;
+  --tui-background-neutral-1: #383838;
+  --tui-border-normal: #3d3d3d;
+  --tui-status-negative: #d93025;
+  --tui-text-primary: #f7f7f7;
+  --tui-text-secondary: #c3c3c3;
+  --tui-text-action: #ffb800;
+  --tui-text-action-hover: #ffc633;
+  --tui-text-negative: #ff6b61;
+  --tui-text-negative-hover: #ff8a82;
+}
+
+/* The design shows weekends like any other day, not in red. */
+tui-calendar-sheet .t-cell[data-type='weekend'] {
+  color: var(--tui-text-primary);
+}
+
 body {
   margin: 0;
 }

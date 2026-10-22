@@ -1,0 +1,136 @@
+@if (session(); as session) {
+  <main class="screen">
+    <div class="toolbar">
+      @if (editing()) {
+        <button
+          tuiButton
+          type="button"
+          appearance="secondary-grayscale"
+          size="m"
+          class="pill end"
+          (click)="editing.set(false)"
+        >
+          Done
+        </button>
+      } @else {
+        <a
+          tuiIconButton
+          routerLink="/history"
+          appearance="secondary-grayscale"
+          iconStart="@tui.chevron-left"
+          size="m"
+          class="round"
+        >
+          Back
+        </a>
+        <button
+          tuiButton
+          type="button"
+          appearance="secondary-grayscale"
+          size="m"
+          iconStart="@tui.calendar"
+          class="pill end"
+          (click)="openDatePicker()"
+        >
+          Change date
+        </button>
+        <button
+          tuiButton
+          type="button"
+          appearance="secondary-grayscale"
+          size="m"
+          class="pill"
+          (click)="editing.set(true)"
+        >
+          Edit
+        </button>
+      }
+    </div>
+
+    <header class="heading">
+      <h1>{{ day(session.date) }}</h1>
+      <p class="names">{{ names() }}</p>
+    </header>
+
+    @if (editing()) {
+      <ul
+        class="card"
+        cdkDropList
+        aria-label="Exercises of this session"
+        (cdkDropListDropped)="drop($event)"
+      >
+        @for (exercise of session.exercises; track exercise.id) {
+          <li class="row" tuiCell cdkDrag cdkDragLockAxis="y">
+            <button
+              tuiIconButton
+              type="button"
+              appearance="action-destructive"
+              size="s"
+              iconStart="@tui.circle-minus"
+              (click)="remove(exercise)"
+            >
+              Remove {{ exercise.name }}
+            </button>
+            <span tuiTitle>{{ exercise.name }}</span>
+            <tui-icon icon="@tui.grip-vertical" class="handle" cdkDragHandle />
+          </li>
+        }
+      </ul>
+    } @else {
+      <ul class="card" aria-label="Exercises of this session">
+        @for (exercise of session.exercises; track exercise.id) {
+          <li class="row" tuiCell>
+            <span tuiTitle>{{ exercise.name }}</span>
+          </li>
+        }
+      </ul>
+
+      <a
+        tuiButton
+        [routerLink]="['/history', session.id, 'add']"
+        appearance="secondary"
+        iconStart="@tui.plus"
+        class="add"
+      >
+        Add exercise
+      </a>
+
+      <button
+        tuiButton
+        type="button"
+        appearance="flat-destructive"
+        class="delete"
+        (click)="deleteSession()"
+      >
+        Delete session
+      </button>
+    }
+  </main>
+
+  <ng-template [(tuiSheetDialog)]="pickingDate" [tuiSheetDialogOptions]="{ label: 'Change date' }">
+    <tui-calendar
+      [value]="pickedDay()"
+      [max]="today"
+      [disabledItemHandler]="takenDay()"
+      [markerHandler]="marker()"
+      (dayClick)="pickedDay.set($event)"
+    />
+    <p class="date-hint">
+      Days with a dot already have a workout, so you can't move this one there.
+    </p>
+    <button
+      tuiButton
+      type="button"
+      size="l"
+      class="move"
+      [disabled]="!pickedDay()"
+      (click)="moveToPickedDay()"
+    >
+      @if (pickedDay(); as picked) {
+        Move to {{ day(picked.toJSON()) }}
+      } @else {
+        Pick a day
+      }
+    </button>
+  </ng-template>
+}

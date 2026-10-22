@@ -2,7 +2,16 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  gap: 0.5rem;
   block-size: 3.5rem;
+}
+
+.round {
+  border-radius: 100%;
+}
+
+.round::before {
+  font-size: 1.25rem;
 }
 
 .heading {

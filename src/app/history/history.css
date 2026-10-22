@@ -1,0 +1,81 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  block-size: 3.5rem;
+}
+
+.round {
+  border-radius: 100%;
+}
+
+.round::before {
+  font-size: 1.25rem;
+}
+
+h1 {
+  margin: 0.5rem 0 0;
+  font-size: 1.75rem;
+  line-height: 2.25rem;
+  font-weight: 800;
+}
+
+h2 {
+  margin: 1.5rem 0 0.5rem;
+  padding-inline: 0.5rem;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  font-weight: 700;
+  color: var(--tui-text-secondary);
+}
+
+.card {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: 1.5rem;
+  background: var(--tui-background-base-alt);
+  overflow: hidden;
+}
+
+.card > * + * {
+  border-block-start: 1px solid var(--tui-border-normal);
+}
+
+.row {
+  min-block-size: 4.5rem;
+  padding-inline: 1.25rem;
+}
+
+[tuiTitle] {
+  min-inline-size: 0;
+  font: var(--tui-typography-ui-l);
+  font-weight: 600;
+}
+
+.names {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+}
+
+.count {
+  flex-shrink: 0;
+  margin-inline-start: auto;
+  font-size: 0.9375rem;
+  color: var(--tui-text-secondary);
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--tui-text-secondary);
+}
+
+.hint {
+  margin: 1rem 0.25rem 0;
+  font: var(--tui-typography-ui-l);
+  color: var(--tui-text-secondary);
+}

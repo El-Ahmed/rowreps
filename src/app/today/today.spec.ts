@@ -2,12 +2,29 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { CdkDropList } from '@angular/cdk/drag-drop';
-import { EXERCISES } from '../exercises';
+import { Exercise } from '../exercises';
 import { TodayList } from '../today-list';
 import { Today } from './today';
 
 describe('Today', () => {
-  const [bench, incline, squat] = EXERCISES;
+  const bench: Exercise = {
+    id: 'Barbell_Bench_Press_-_Medium_Grip',
+    name: 'Barbell Bench Press - Medium Grip',
+    primaryMuscles: ['chest'],
+    secondaryMuscles: ['shoulders', 'triceps'],
+  };
+  const pullups: Exercise = {
+    id: 'Pullups',
+    name: 'Pullups',
+    primaryMuscles: ['lats'],
+    secondaryMuscles: ['biceps', 'middle back'],
+  };
+  const squat: Exercise = {
+    id: 'Barbell_Squat',
+    name: 'Barbell Squat',
+    primaryMuscles: ['quadriceps'],
+    secondaryMuscles: ['calves', 'glutes', 'hamstrings', 'lower back'],
+  };
   let fixture: ComponentFixture<Today>;
   let todayList: TodayList;
 
@@ -37,28 +54,28 @@ describe('Today', () => {
 
   it("lists today's exercises in order", async () => {
     todayList.add(bench);
-    todayList.add(incline);
+    todayList.add(pullups);
     await render();
 
-    expect(names()).toEqual([bench.name, incline.name]);
+    expect(names()).toEqual([bench.name, pullups.name]);
     expect(element().textContent).not.toContain('What are you lifting today?');
   });
 
   it('deletes an exercise with its swipe action', async () => {
     todayList.add(bench);
-    todayList.add(incline);
+    todayList.add(pullups);
     await render();
 
     button(`Delete ${bench.name}`)?.click();
     await render();
 
-    expect(names()).toEqual([incline.name]);
+    expect(names()).toEqual([pullups.name]);
   });
 
   describe('edit mode', () => {
     beforeEach(async () => {
       todayList.add(bench);
-      todayList.add(incline);
+      todayList.add(pullups);
       todayList.add(squat);
       await render();
       button('Edit')?.click();
@@ -71,7 +88,7 @@ describe('Today', () => {
     });
 
     it('removes an exercise', async () => {
-      button(`Remove ${incline.name}`)?.click();
+      button(`Remove ${pullups.name}`)?.click();
       await render();
 
       expect(names()).toEqual([bench.name, squat.name]);
@@ -83,11 +100,11 @@ describe('Today', () => {
         .triggerEventHandler('cdkDropListDropped', { previousIndex: 0, currentIndex: 2 });
       await render();
 
-      expect(names()).toEqual([incline.name, squat.name, bench.name]);
+      expect(names()).toEqual([pullups.name, squat.name, bench.name]);
     });
 
     it('leaves edit mode after the last exercise is removed', async () => {
-      for (const exercise of [bench, incline, squat]) {
+      for (const exercise of [bench, pullups, squat]) {
         button(`Remove ${exercise.name}`)?.click();
         await render();
       }

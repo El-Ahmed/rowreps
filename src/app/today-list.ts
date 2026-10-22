@@ -15,7 +15,7 @@ export class TodayList {
   }
 
   remove(exercise: Exercise): void {
-    this.list.update((list) => list.filter((item) => item.name !== exercise.name));
+    this.list.update((list) => list.filter((item) => item.id !== exercise.id));
   }
 
   move(from: number, to: number): void {
@@ -27,6 +27,6 @@ export class TodayList {
   }
 
   has(exercise: Exercise): boolean {
-    return this.list().some((item) => item.name === exercise.name);
+    return this.list().some((item) => item.id === exercise.id);
   }
 }

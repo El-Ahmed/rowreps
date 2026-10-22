@@ -1,11 +1,37 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Router, provideRouter } from '@angular/router';
-import { EXERCISES } from '../exercises';
+import { Exercise } from '../exercises';
 import { TodayList } from '../today-list';
 import { AddExercise } from './add-exercise';
 
 describe('AddExercise', () => {
-  const [bench] = EXERCISES;
+  const bench: Exercise = {
+    id: 'Barbell_Bench_Press_-_Medium_Grip',
+    name: 'Barbell Bench Press - Medium Grip',
+    primaryMuscles: ['chest'],
+    secondaryMuscles: ['shoulders', 'triceps'],
+  };
+  const squat: Exercise = {
+    id: 'Barbell_Squat',
+    name: 'Barbell Squat',
+    primaryMuscles: ['quadriceps'],
+    secondaryMuscles: ['calves', 'glutes', 'hamstrings', 'lower back'],
+  };
+  const gobletSquat: Exercise = {
+    id: 'Goblet_Squat',
+    name: 'Goblet Squat',
+    primaryMuscles: ['quadriceps'],
+    secondaryMuscles: ['calves', 'glutes', 'hamstrings', 'shoulders'],
+  };
+  const pullups: Exercise = {
+    id: 'Pullups',
+    name: 'Pullups',
+    primaryMuscles: ['lats'],
+    secondaryMuscles: ['biceps', 'middle back'],
+  };
+
   let fixture: ComponentFixture<AddExercise>;
   let todayList: TodayList;
 
@@ -28,26 +54,35 @@ describe('AddExercise', () => {
   }
 
   beforeEach(async () => {
-    TestBed.configureTestingModule({ providers: [provideRouter([])] });
+    TestBed.configureTestingModule({
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
+    });
     todayList = TestBed.inject(TodayList);
     fixture = TestBed.createComponent(AddExercise);
+    TestBed.inject(HttpTestingController)
+      .expectOne('free-exercise-db/exercises.json')
+      .flush([bench, squat, gobletSquat, pullups]);
     await render();
   });
 
-  it('lists every exercise grouped by muscle group', () => {
-    expect(groups()).toEqual(['Chest', 'Back', 'Legs', 'Arms']);
-    expect(optionNames()).toEqual(EXERCISES.map((exercise) => exercise.name));
+  afterEach(() => {
+    TestBed.inject(HttpTestingController).verify();
   });
 
-  it('shows the muscles each exercise works', () => {
-    expect(options()[0].textContent).toContain(bench.muscles);
+  it('lists every exercise grouped by primary muscle, groups in alphabetical order', () => {
+    expect(groups()).toEqual(['Chest', 'Lats', 'Quadriceps']);
+    expect(optionNames()).toEqual([bench.name, pullups.name, squat.name, gobletSquat.name]);
+  });
+
+  it('shows the primary then secondary muscles each exercise works', () => {
+    expect(options()[0].textContent).toContain('Chest · Shoulders · Triceps');
   });
 
   it('filters by name, ignoring case', async () => {
     await search('SQU');
 
-    expect(groups()).toEqual(['Legs']);
-    expect(optionNames()).toEqual(['Squat', 'Goblet Squat']);
+    expect(groups()).toEqual(['Quadriceps']);
+    expect(optionNames()).toEqual([squat.name, gobletSquat.name]);
   });
 
   it('says so when nothing matches', async () => {

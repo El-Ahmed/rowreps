@@ -42,7 +42,18 @@
           </button>
         }
         @default {
-          <span class="spacer"></span>
+          <button
+            tuiIconButton
+            type="button"
+            appearance="secondary-grayscale"
+            iconStart="@tui.trending-up"
+            size="m"
+            class="round"
+            [attr.aria-label]="lift.name + ': progress and how to'"
+            (click)="sheetOpen.set(true)"
+          >
+            Progress and how to
+          </button>
         }
       }
     </div>
@@ -256,4 +267,8 @@
       }
     }
   </main>
+
+  <ng-template [(tuiSheetDialog)]="sheetOpen" [tuiSheetDialogOptions]="{ label: lift.name }">
+    <app-lift-sheet [lift]="lift" />
+  </ng-template>
 }

@@ -1,0 +1,34 @@
+:host {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0;
+}
+
+figcaption {
+  font: var(--tui-typography-body-s);
+  color: var(--tui-text-secondary);
+}
+
+svg {
+  max-inline-size: 100%;
+  block-size: auto;
+  fill: color-mix(in srgb, var(--tui-text-primary) 20%, var(--tui-background-neutral-1));
+  stroke: var(--tui-background-neutral-1);
+  stroke-width: 2;
+}
+
+.primary {
+  fill: var(--tui-background-accent-1);
+}
+
+.secondary {
+  fill: color-mix(in srgb, var(--tui-background-accent-1) 50%, var(--tui-background-neutral-1));
+}

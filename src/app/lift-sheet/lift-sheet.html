@@ -1,0 +1,116 @@
+<tui-segmented size="l" class="tabs" [(activeItemIndex)]="tab">
+  <button type="button">How to</button>
+  <button type="button">Progress</button>
+</tui-segmented>
+
+@if (tab() === 0) {
+  <div class="card muscles">
+    <app-muscle-figure [primary]="lift().primaryMuscles" [secondary]="lift().secondaryMuscles" />
+    <ul class="legend">
+      <li>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="muscle">{{ primary() }}</span>
+        <span class="secondary">
+          {{ lift().primaryMuscles.length > 1 ? 'Main muscles' : 'Main muscle' }}
+        </span>
+      </li>
+      @if (secondary()) {
+        <li>
+          <span class="dot helper" aria-hidden="true"></span>
+          <span class="muscle">{{ secondary() }}</span>
+          <span class="secondary">Also work</span>
+        </li>
+      }
+    </ul>
+  </div>
+
+  @if (instructions().length) {
+    <section>
+      <h3>How to do it</h3>
+      <ol class="card steps">
+        @for (step of instructions(); track $index) {
+          <li>
+            <span class="number" aria-hidden="true">{{ $index + 1 }}</span>
+            <span>{{ step }}</span>
+          </li>
+        }
+      </ol>
+    </section>
+  }
+
+  <section>
+    <h3>Watch it done</h3>
+    <div class="links">
+      <a
+        tuiButton
+        appearance="secondary-grayscale"
+        size="l"
+        iconEnd="@tui.external-link"
+        target="_blank"
+        rel="noopener"
+        [href]="youTube()"
+        [attr.aria-label]="'Search YouTube for ' + lift().name"
+      >
+        YouTube
+      </a>
+      <a
+        tuiButton
+        appearance="secondary-grayscale"
+        size="l"
+        iconEnd="@tui.external-link"
+        target="_blank"
+        rel="noopener"
+        [href]="tikTok()"
+        [attr.aria-label]="'Search TikTok for ' + lift().name"
+      >
+        TikTok
+      </a>
+    </div>
+    <p class="hint">Opens a search for {{ lift().name }}</p>
+  </section>
+
+  @if (instructions().length) {
+    <p class="credit">Exercise text: free-exercise-db (public domain)</p>
+  }
+} @else {
+  @if (points().length > 1) {
+    <div class="summary">
+      <p class="gain">
+        <span class="amount">{{ gain() }}</span>
+        <span class="secondary">in {{ points().length }} sessions</span>
+      </p>
+      <p class="hint">Heaviest set per session</p>
+    </div>
+
+    <div class="card chart">
+      <tui-axes [horizontalLines]="3" [verticalLines]="1" class="axes">
+        <tui-line-chart
+          [value]="points()"
+          [x]="0"
+          [y]="range().y"
+          [width]="points().length - 1"
+          [height]="range().height"
+          [dots]="true"
+          [attr.aria-label]="chartLabel()"
+          role="img"
+        />
+      </tui-axes>
+    </div>
+  }
+
+  <ul class="sessions" aria-label="Sessions">
+    @for (item of history(); track item.date) {
+      <li>
+        <span class="day">
+          <span class="date">{{ item.date | date: 'EEE d MMM' }}</span>
+          @if (item.lift.note) {
+            <span class="secondary note">{{ item.lift.note }}</span>
+          }
+        </span>
+        <span class="sets">{{ sets(item.lift) }}</span>
+      </li>
+    } @empty {
+      <li class="hint">No sets logged yet. Each workout's sets show up here.</li>
+    }
+  </ul>
+}

@@ -1,0 +1,207 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  font-variant-numeric: tabular-nums;
+}
+
+p,
+h3 {
+  margin: 0;
+}
+
+/* The two views share the width, as in the design. */
+.tabs > button {
+  flex: 1 1 0;
+}
+
+.secondary {
+  color: var(--tui-text-secondary);
+}
+
+.hint {
+  padding-inline: 0.5rem;
+  font: var(--tui-typography-body-s);
+  color: var(--tui-text-secondary);
+}
+
+.card {
+  margin: 0;
+  border-radius: 1.5rem;
+  background: var(--tui-background-neutral-1);
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+h3 {
+  padding-inline: 0.5rem;
+  font: var(--tui-typography-heading-h6);
+}
+
+/* How to */
+
+.muscles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0 0.25rem;
+  list-style: none;
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.dot {
+  flex-shrink: 0;
+  inline-size: 0.75rem;
+  block-size: 0.75rem;
+  border-radius: 100%;
+  background: var(--tui-background-accent-1);
+}
+
+.dot.helper {
+  background: color-mix(
+    in srgb,
+    var(--tui-background-accent-1) 50%,
+    var(--tui-background-neutral-1)
+  );
+}
+
+.muscle {
+  font: var(--tui-typography-body-m);
+  font-weight: 700;
+}
+
+.legend .secondary {
+  font: var(--tui-typography-body-s);
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 1rem;
+  list-style: none;
+  font: var(--tui-typography-body-m);
+}
+
+.steps li {
+  display: flex;
+  gap: 0.75rem;
+  padding-block: 0.5rem;
+}
+
+.number {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  border-radius: 100%;
+  background: var(--tui-background-neutral-2);
+  font: var(--tui-typography-body-s);
+  font-weight: 800;
+}
+
+.links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.links a {
+  border-radius: 1rem;
+}
+
+.credit {
+  padding-inline: 0.5rem;
+  font: var(--tui-typography-body-xs);
+  color: var(--tui-text-secondary);
+}
+
+/* Progress */
+
+.summary {
+  display: flex;
+  flex-direction: column;
+}
+
+.gain {
+  display: flex;
+  align-items: baseline;
+  gap: 0.625rem;
+  padding-inline: 0.5rem;
+  font: var(--tui-typography-body-m);
+}
+
+.amount {
+  font-size: 2.25rem;
+  line-height: 2.75rem;
+  font-weight: 800;
+  color: var(--tui-text-action);
+}
+
+.chart {
+  padding: 0.75rem;
+}
+
+.axes {
+  block-size: 8.75rem;
+  color: var(--tui-background-accent-1);
+}
+
+.sessions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sessions li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-sizing: border-box;
+  min-block-size: 3rem;
+  padding: 0.5rem;
+}
+
+.day {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+.date {
+  font: var(--tui-typography-body-m);
+  font-weight: 700;
+}
+
+.note {
+  font: var(--tui-typography-body-s);
+}
+
+.sets {
+  font: var(--tui-typography-body-s);
+  font-weight: 600;
+  color: var(--tui-text-secondary);
+  white-space: nowrap;
+}

@@ -25,7 +25,7 @@
             size="m"
             class="pill"
             [disabled]="!valid()"
-            (click)="editing.set(!editing())"
+            (click)="toggleEditing()"
           >
             {{ editing() ? 'Done' : 'Edit' }}
           </button>
@@ -77,31 +77,49 @@
         </p>
       }
 
-      @if (editing()) {
-        <div class="numbers">
-          <tui-textfield [tuiTextfieldCleaner]="false" class="big">
-            <label tuiLabel for="weight">Weight (kg)</label>
-            <input id="weight" tuiInputNumber [min]="0" [(ngModel)]="weight" />
-          </tui-textfield>
+      <!-- The numbers look the same while typing; Edit only makes them typable. -->
+      <div class="numbers">
+        <p class="weight-value">
           <tui-textfield
             [tuiTextfieldCleaner]="false"
-            class="big"
+            class="inline"
+            [tuiNumberFormat]="{ maximumFractionDigits: 2, minimumFractionDigits: 0 }"
+          >
+            <input
+              #weightInput
+              tuiInputNumber
+              aria-label="Weight (kg)"
+              placeholder="0"
+              class="number"
+              [min]="0"
+              [readOnly]="!editing()"
+              [style.inline-size]="width(weight())"
+              [(ngModel)]="weight"
+            />
+          </tui-textfield>
+          <span class="unit">kg</span>
+        </p>
+        <p class="reps-value">
+          <span class="number">×</span>
+          <tui-textfield
+            [tuiTextfieldCleaner]="false"
+            class="inline"
             [tuiNumberFormat]="{ maximumFractionDigits: 0 }"
           >
-            <label tuiLabel for="reps">Reps</label>
-            <input id="reps" tuiInputNumber [min]="1" [(ngModel)]="reps" />
+            <input
+              tuiInputNumber
+              aria-label="Reps"
+              placeholder="0"
+              class="number"
+              [min]="1"
+              [readOnly]="!editing()"
+              [style.inline-size]="width(reps())"
+              [(ngModel)]="reps"
+            />
           </tui-textfield>
-        </div>
-      } @else {
-        <div class="numbers">
-          <p class="weight-value">
-            <span class="number">{{ weight() }}</span> <span class="unit">kg</span>
-          </p>
-          <p class="reps-value">
-            <span class="number">× {{ reps() }}</span> <span class="unit">reps</span>
-          </p>
-        </div>
-      }
+          <span class="unit">reps</span>
+        </p>
+      </div>
 
       <button
         tuiButton
@@ -142,19 +160,21 @@
           </div>
         }
 
-        <button
-          type="button"
-          class="timer"
-          [attr.aria-label]="'Rest timer, ' + clock(rest()) + ' left. Tap to add 15 seconds.'"
-          (click)="moreRest()"
-        >
-          <tui-progress-circle size="xxl" class="ring" [value]="rest()" [max]="restTotal()" />
-          <span class="timer-text">
-            <span class="time">{{ clock(rest()) }}</span>
-            <span class="secondary">Rest</span>
-          </span>
-        </button>
-      } @else {
+        @if (resting()) {
+          <button
+            type="button"
+            class="timer"
+            [attr.aria-label]="'Rest timer, ' + clock(rest()) + ' left. Tap to add 15 seconds.'"
+            (click)="moreRest()"
+          >
+            <tui-progress-circle size="xxl" class="ring" [value]="rest()" [max]="restTotal()" />
+            <span class="timer-text">
+              <span class="time">{{ clock(rest()) }}</span>
+              <span class="secondary">Rest</span>
+            </span>
+          </button>
+        }
+      } @else if (resting()) {
         <div class="rest-row">
           <span class="secondary">Rest</span>
           <span class="time-small">{{ clock(rest()) }}</span>

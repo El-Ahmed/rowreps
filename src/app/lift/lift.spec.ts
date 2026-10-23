@@ -50,6 +50,8 @@ describe('LiftScreen', () => {
   }
 
   const input = (selector: string) => element().querySelector(selector) as HTMLInputElement;
+  const weight = () => input('[aria-label="Weight (kg)"]');
+  const reps = () => input('[aria-label="Reps"]');
 
   // Saves the exercise to the day with these sets.
   async function log(date: string, exercise: Exercise, ...sets: WorkSet[]): Promise<void> {
@@ -85,14 +87,14 @@ describe('LiftScreen', () => {
     it('asks for the weight and reps of set 1', () => {
       expect(text()).toContain('Set 1');
       expect(text()).not.toContain('Last time');
-      expect(input('#weight')).not.toBeNull();
-      expect(input('#reps')).not.toBeNull();
+      expect(weight().readOnly).toBe(false);
+      expect(reps().readOnly).toBe(false);
       expect(button('Log set')?.disabled).toBe(true);
     });
 
     it('logs the typed set and starts the rest', async () => {
-      type(input('#weight'), '80');
-      type(input('#reps'), '8');
+      type(weight(), '80');
+      type(reps(), '8');
       await render();
       button('Log set')?.click();
 
@@ -127,9 +129,9 @@ describe('LiftScreen', () => {
       expect(text()).toContain('Set 1 of 3');
       expect(text()).toContain('Last time · 80 kg × 8');
       expect(text()).toContain('Mon 5 Jan · Reduce weight next time');
-      expect(element().querySelector('.weight-value')?.textContent).toContain('80');
-      expect(element().querySelector('.reps-value')?.textContent).toContain('× 8');
-      expect(input('#weight')).toBeNull();
+      expect(weight().value).toBe('80');
+      expect(reps().value).toBe('8');
+      expect(weight().readOnly).toBe(true);
     });
 
     it('compares each logged set with the same set last time', async () => {
@@ -140,7 +142,9 @@ describe('LiftScreen', () => {
       await shows('Set 2 of 3');
       button('Edit')?.click();
       await render();
-      type(input('#weight'), '82.5');
+      expect(weight().readOnly).toBe(false);
+      expect(document.activeElement).toBe(weight());
+      type(weight(), '82.5');
       await render();
       button('Done')?.click();
       await render();
@@ -164,10 +168,23 @@ describe('LiftScreen', () => {
     });
   });
 
+  it('opens a lift that already has sets on its rest, without a timer', async () => {
+    await log(today(), bench, { weight: 80, reps: 8 });
+    await open(bench);
+
+    await shows('New set');
+    expect(text()).toContain('80 kg × 8');
+    expect(text()).toContain('Finish lift');
+    expect(element().querySelector('.timer')).toBeNull();
+    expect(text()).not.toContain('logged');
+  });
+
   describe('resting', () => {
     beforeEach(async () => {
       await log(today(), bench, { weight: 80, reps: 8 });
       await open(bench);
+      await shows('New set');
+      button('New set')?.click();
       await shows('Set 2');
       button('Log set')?.click();
       await shows('Set 2 logged');

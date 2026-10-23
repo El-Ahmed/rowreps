@@ -1,4 +1,5 @@
 .screen {
+  font-variant-numeric: tabular-nums;
   min-block-size: 100dvh;
 }
 
@@ -59,7 +60,6 @@ p {
   text-align: center;
   font: var(--tui-typography-body-l);
   color: var(--tui-text-secondary);
-  font-variant-numeric: tabular-nums;
 }
 
 .last-note {
@@ -83,7 +83,6 @@ p {
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
-  font-variant-numeric: tabular-nums;
 }
 
 .weight-value .number {
@@ -105,14 +104,23 @@ p {
   font-weight: 600;
 }
 
-.big {
-  inline-size: 12rem;
+/* A Taiga number field drawn as the plain number: no box, the number's own type. */
+.inline[data-appearance] {
+  inline-size: auto;
+  block-size: auto;
+  min-block-size: 0;
+  padding: 0;
+  background: none;
+  outline: none;
+  font: inherit;
 }
 
-.big input {
-  text-align: center;
-  font-size: 2.5rem;
-  font-weight: 700;
+.inline input {
+  position: static;
+  block-size: auto;
+  padding: 0;
+  font: inherit;
+  caret-color: var(--tui-background-accent-1);
 }
 
 .main {
@@ -199,7 +207,6 @@ p {
   font-size: 3.125rem;
   line-height: 3.5rem;
   font-weight: 600;
-  font-variant-numeric: tabular-nums;
 }
 
 .rest-row {
@@ -214,7 +221,6 @@ p {
   font-size: 1.75rem;
   line-height: 2.125rem;
   font-weight: 600;
-  font-variant-numeric: tabular-nums;
 }
 
 .card {
@@ -251,10 +257,6 @@ p {
   flex-shrink: 0;
   font: var(--tui-typography-body-m);
   color: var(--tui-text-secondary);
-}
-
-.set-value {
-  font-variant-numeric: tabular-nums;
 }
 
 .chevron {

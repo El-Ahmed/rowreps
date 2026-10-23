@@ -1,4 +1,16 @@
-import { Component, computed, effect, inject, input, linkedSignal, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Injector,
+  afterNextRender,
+  computed,
+  effect,
+  inject,
+  input,
+  linkedSignal,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -39,7 +51,9 @@ type Notice = { kind: 'logged'; index: number } | { kind: 'deleted'; index: numb
 export class LiftScreen {
   private readonly sessions = inject(Sessions);
   private readonly router = inject(Router);
+  private readonly injector = inject(Injector);
   private readonly date = TuiDay.currentLocal().toJSON();
+  private readonly weightInput = viewChild<ElementRef<HTMLInputElement>>('weightInput');
 
   // The exercise id, from /lift/:id. The lift is always one of today's exercises.
   readonly id = input.required<string>();
@@ -74,13 +88,20 @@ export class LiftScreen {
 
   // 'set' enters the next set, 'rest' follows a logged set,
   // 'sets' fixes the logged sets in place and 'note' writes the note.
-  protected readonly mode = signal<'set' | 'rest' | 'sets' | 'note'>('set');
+  // A lift that already has sets opens on the rest, with its sets and note.
+  private readonly hasSets = computed(() => this.sets().length > 0);
+  protected readonly mode = linkedSignal<boolean, 'set' | 'rest' | 'sets' | 'note'>({
+    source: this.hasSets,
+    computation: (hasSets) => (hasSets ? 'rest' : 'set'),
+  });
   protected readonly notice = signal<Notice | null>(null);
   protected readonly comparison = computed(() => {
     const notice = this.notice();
     return notice?.kind === 'logged' ? this.compare(notice.index) : '';
   });
 
+  // The rest timer only shows once a set has been logged on this screen.
+  protected readonly resting = signal(false);
   protected readonly rest = signal(0);
   protected readonly restTotal = signal(REST_SECONDS);
 
@@ -107,9 +128,30 @@ export class LiftScreen {
       reps: this.reps()!,
     });
     this.notice.set({ kind: 'logged', index });
+    this.resting.set(true);
     this.rest.set(REST_SECONDS);
     this.restTotal.set(REST_SECONDS);
     this.mode.set('rest');
+  }
+
+  // Edit makes the numbers typable where they are, with the caret after the weight.
+  protected toggleEditing(): void {
+    this.editing.update((editing) => !editing);
+    if (this.editing()) {
+      afterNextRender(
+        () => {
+          const input = this.weightInput()!.nativeElement;
+          input.focus();
+          input.setSelectionRange(input.value.length, input.value.length);
+        },
+        { injector: this.injector },
+      );
+    }
+  }
+
+  // Sizes a number field to its digits, so it reads like the plain number.
+  protected width(value: number | null): string {
+    return `${Math.max(String(value ?? '').length, 1) + 0.25}ch`;
   }
 
   protected async undo(): Promise<void> {

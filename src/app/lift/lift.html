@@ -1,0 +1,248 @@
+@if (lift(); as lift) {
+  <main class="screen">
+    <div class="toolbar">
+      @if (mode() === 'sets' || mode() === 'note') {
+        <span class="spacer"></span>
+      } @else {
+        <a
+          tuiIconButton
+          routerLink="/"
+          appearance="secondary-grayscale"
+          iconStart="@tui.chevron-left"
+          size="m"
+          class="round"
+        >
+          Back
+        </a>
+      }
+      <h1>{{ lift.name }}</h1>
+      @switch (mode()) {
+        @case ('set') {
+          <button
+            tuiButton
+            type="button"
+            appearance="secondary-grayscale"
+            size="m"
+            class="pill"
+            [disabled]="!valid()"
+            (click)="editing.set(!editing())"
+          >
+            {{ editing() ? 'Done' : 'Edit' }}
+          </button>
+        }
+        @case ('sets') {
+          <button
+            tuiButton
+            type="button"
+            appearance="secondary-grayscale"
+            size="m"
+            class="pill"
+            (click)="saveSets()"
+          >
+            Done
+          </button>
+        }
+        @case ('note') {
+          <button
+            tuiButton
+            type="button"
+            appearance="secondary-grayscale"
+            size="m"
+            class="pill"
+            (click)="saveNote()"
+          >
+            Done
+          </button>
+        }
+        @default {
+          <span class="spacer"></span>
+        }
+      }
+    </div>
+
+    @if (mode() === 'set') {
+      <div class="counters">
+        @if (position()) {
+          <p class="secondary">{{ position() }}</p>
+        }
+        <span tuiBadge appearance="neutral" size="l">{{ setLabel() }}</span>
+      </div>
+
+      @if (lastTimeSet(); as last) {
+        <p class="last">Last time · {{ last.weight }} kg × {{ last.reps }}</p>
+      }
+      @if (lastTime()?.lift?.note; as note) {
+        <p class="last-note">
+          <span class="secondary">{{ lastTime()!.date | date: 'EEE d MMM' }} · </span>{{ note }}
+        </p>
+      }
+
+      @if (editing()) {
+        <div class="numbers">
+          <tui-textfield [tuiTextfieldCleaner]="false" class="big">
+            <label tuiLabel for="weight">Weight (kg)</label>
+            <input id="weight" tuiInputNumber [min]="0" [(ngModel)]="weight" />
+          </tui-textfield>
+          <tui-textfield
+            [tuiTextfieldCleaner]="false"
+            class="big"
+            [tuiNumberFormat]="{ maximumFractionDigits: 0 }"
+          >
+            <label tuiLabel for="reps">Reps</label>
+            <input id="reps" tuiInputNumber [min]="1" [(ngModel)]="reps" />
+          </tui-textfield>
+        </div>
+      } @else {
+        <div class="numbers">
+          <p class="weight-value">
+            <span class="number">{{ weight() }}</span> <span class="unit">kg</span>
+          </p>
+          <p class="reps-value">
+            <span class="number">× {{ reps() }}</span> <span class="unit">reps</span>
+          </p>
+        </div>
+      }
+
+      <button
+        tuiButton
+        type="button"
+        size="l"
+        class="main"
+        [disabled]="!valid()"
+        (click)="logSet()"
+      >
+        Log set
+      </button>
+    } @else {
+      @if (mode() === 'rest') {
+        @if (notice(); as notice) {
+          <div class="notice">
+            @if (notice.kind === 'logged') {
+              <tui-icon icon="@tui.check" class="mark" />
+              <p class="notice-text">
+                <span class="notice-title">Set {{ notice.index + 1 }} logged</span>
+                @if (comparison()) {
+                  <span class="comparison" [class.behind]="comparison().startsWith('−')">
+                    {{ comparison() }}
+                  </span>
+                }
+              </p>
+            } @else {
+              <tui-icon icon="@tui.trash-2" class="mark deleted" />
+              <p class="notice-text">
+                <span class="notice-title">Set deleted</span>
+                <span class="secondary">
+                  Set {{ notice.index + 1 }} · {{ notice.set.weight }} kg × {{ notice.set.reps }}
+                </span>
+              </p>
+            }
+            <button tuiButton type="button" appearance="flat" size="m" (click)="undo()">
+              Undo
+            </button>
+          </div>
+        }
+
+        <button
+          type="button"
+          class="timer"
+          [attr.aria-label]="'Rest timer, ' + clock(rest()) + ' left. Tap to add 15 seconds.'"
+          (click)="moreRest()"
+        >
+          <tui-progress-circle size="xxl" class="ring" [value]="rest()" [max]="restTotal()" />
+          <span class="timer-text">
+            <span class="time">{{ clock(rest()) }}</span>
+            <span class="secondary">Rest</span>
+          </span>
+        </button>
+      } @else {
+        <div class="rest-row">
+          <span class="secondary">Rest</span>
+          <span class="time-small">{{ clock(rest()) }}</span>
+        </div>
+      }
+
+      @if (mode() !== 'note') {
+        <ul class="card sets" aria-label="Logged sets">
+          @if (mode() === 'sets') {
+            @for (draft of drafts(); track $index) {
+              <li class="set fixing">
+                <span class="set-label">Set {{ $index + 1 }}</span>
+                <span class="fields">
+                  <tui-textfield tuiTextfieldSize="s" [tuiTextfieldCleaner]="false" class="small">
+                    <input
+                      tuiInputNumber
+                      [min]="0"
+                      [attr.aria-label]="'Set ' + ($index + 1) + ' weight (kg)'"
+                      [(ngModel)]="draft.weight"
+                    />
+                  </tui-textfield>
+                  <span class="secondary">kg</span>
+                  <tui-textfield
+                    tuiTextfieldSize="s"
+                    [tuiTextfieldCleaner]="false"
+                    class="small"
+                    [tuiNumberFormat]="{ maximumFractionDigits: 0 }"
+                  >
+                    <input
+                      tuiInputNumber
+                      [min]="1"
+                      [attr.aria-label]="'Set ' + ($index + 1) + ' reps'"
+                      [(ngModel)]="draft.reps"
+                    />
+                  </tui-textfield>
+                  <span class="secondary">reps</span>
+                </span>
+              </li>
+            }
+          } @else {
+            @for (set of lift.sets; track $index) {
+              <li>
+                <tui-swipe-actions>
+                  <button type="button" class="set" (click)="fixSets()">
+                    <span class="set-label">Set {{ $index + 1 }}</span>
+                    <span class="set-value">{{ set.weight }} kg × {{ set.reps }}</span>
+                    <tui-icon icon="@tui.chevron-right" class="chevron" />
+                  </button>
+                  <button
+                    tuiButton
+                    tuiSwipeAction
+                    type="button"
+                    appearance="primary-destructive"
+                    [attr.aria-label]="'Delete set ' + ($index + 1)"
+                    (click)="deleteSet($index)"
+                  >
+                    Delete
+                  </button>
+                </tui-swipe-actions>
+              </li>
+            }
+          }
+        </ul>
+      }
+
+      @if (mode() === 'note') {
+        <tui-textfield class="note-field">
+          <label tuiLabel for="note">{{ lift.name }} · Today</label>
+          <textarea id="note" tuiTextarea [(ngModel)]="note"></textarea>
+        </tui-textfield>
+      } @else {
+        <button type="button" class="card note" (click)="writeNote()">
+          <tui-icon icon="@tui.pencil" class="secondary" />
+          <span class="note-text">
+            <span class="note-label">{{ lift.name }} · Today</span>
+            <span [class.secondary]="!lift.note">{{ lift.note || 'Add note' }}</span>
+          </span>
+        </button>
+      }
+
+      @if (mode() === 'rest') {
+        <div class="actions">
+          <button tuiButton type="button" size="l" class="main" (click)="mode.set('set')">
+            New set
+          </button>
+          <a tuiButton routerLink="/" appearance="flat-grayscale" size="l">Finish lift</a>
+        </div>
+      }
+    }
+  </main>
+}

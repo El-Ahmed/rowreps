@@ -77,10 +77,35 @@
         }
       </ul>
     } @else {
-      <ul class="card" aria-label="Exercises of this session">
-        @for (exercise of session.exercises; track exercise.id) {
-          <li class="row" tuiCell>
-            <span tuiTitle>{{ exercise.name }}</span>
+      <ul class="lifts" aria-label="Exercises of this session">
+        @for (lift of session.exercises; track lift.id) {
+          <li class="lift">
+            <span tuiTitle>{{ lift.name }}</span>
+            <button
+              type="button"
+              class="note"
+              [class.empty]="!lift.note"
+              [attr.aria-label]="'Note on ' + lift.name"
+              (click)="openNote(lift)"
+            >
+              {{ lift.note || 'Add note' }}
+            </button>
+            @for (set of lift.sets; track $index) {
+              <button type="button" class="set" (click)="openSet(lift, $index)">
+                <span class="set-label">Set {{ $index + 1 }}</span>
+                <span class="set-value">{{ set.weight }} kg × {{ set.reps }}</span>
+                <tui-icon icon="@tui.chevron-right" class="chevron" />
+              </button>
+            }
+            <button
+              type="button"
+              class="set add-set"
+              [attr.aria-label]="'Add a set of ' + lift.name"
+              (click)="openSet(lift, null)"
+            >
+              <tui-icon icon="@tui.plus" />
+              Add a set
+            </button>
           </li>
         }
       </ul>
@@ -131,6 +156,50 @@
       } @else {
         Pick a day
       }
+    </button>
+  </ng-template>
+
+  <ng-template [(tuiSheetDialog)]="editingSet" [tuiSheetDialogOptions]="{ label: setLabel() }">
+    <div class="set-fields">
+      <tui-textfield>
+        <label tuiLabel for="set-weight">Weight (kg)</label>
+        <input id="set-weight" tuiInputNumber [min]="0" [(ngModel)]="weight" />
+      </tui-textfield>
+      <tui-textfield [tuiNumberFormat]="{ maximumFractionDigits: 0 }">
+        <label tuiLabel for="set-reps">Reps</label>
+        <input id="set-reps" tuiInputNumber [min]="1" [(ngModel)]="reps" />
+      </tui-textfield>
+    </div>
+    <button
+      tuiButton
+      type="button"
+      size="l"
+      class="move"
+      [disabled]="!validSet()"
+      (click)="saveSet()"
+    >
+      Save
+    </button>
+    @if (setTarget()?.index !== null) {
+      <button
+        tuiButton
+        type="button"
+        appearance="flat-destructive"
+        class="delete-set"
+        (click)="deleteSet()"
+      >
+        Delete set
+      </button>
+    }
+  </ng-template>
+
+  <ng-template [(tuiSheetDialog)]="editingNote" [tuiSheetDialogOptions]="{ label: noteLabel() }">
+    <tui-textfield>
+      <label tuiLabel for="note">Note</label>
+      <textarea id="note" tuiTextarea [(ngModel)]="note"></textarea>
+    </tui-textfield>
+    <button tuiButton type="button" size="l" class="move save-note" (click)="saveNote()">
+      Save
     </button>
   </ng-template>
 }

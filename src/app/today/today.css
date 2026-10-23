@@ -30,6 +30,12 @@ h1 {
   font: var(--tui-typography-heading-h4);
 }
 
+.progress {
+  margin: 0.5rem 0 0;
+  font: var(--tui-typography-body-m);
+  color: var(--tui-text-secondary);
+}
+
 .hint {
   margin: 0.75rem 0 0;
   font: var(--tui-typography-heading-h5);
@@ -63,6 +69,27 @@ h1 {
 [tuiTitle] {
   font: var(--tui-typography-ui-l);
   font-weight: 600;
+}
+
+.summary {
+  font: var(--tui-typography-body-s);
+  font-variant-numeric: tabular-nums;
+}
+
+.done {
+  flex-shrink: 0;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  border-radius: 100%;
+  background: var(--tui-background-accent-1);
+  color: var(--tui-text-primary-on-accent-1);
+  font-size: 1rem;
+}
+
+.chevron {
+  flex-shrink: 0;
+  margin-inline-start: auto;
+  color: var(--tui-text-secondary);
 }
 
 .handle {

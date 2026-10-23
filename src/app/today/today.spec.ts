@@ -3,6 +3,7 @@ import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { CdkDropList } from '@angular/cdk/drag-drop';
 import { TuiDay } from '@taiga-ui/cdk';
+import { db } from '../db';
 import { Exercise } from '../exercises';
 import { Sessions } from '../sessions';
 import { Today } from './today';
@@ -30,8 +31,11 @@ describe('Today', () => {
   let sessions: Sessions;
 
   const element = () => fixture.nativeElement as HTMLElement;
+  // The exercise names, without the line under them.
   const names = () =>
-    [...element().querySelectorAll('li [tuiTitle]')].map((title) => title.textContent?.trim());
+    [...element().querySelectorAll('li [tuiTitle]')].map((title) =>
+      title.firstChild?.textContent?.trim(),
+    );
   const button = (text: string) =>
     [...element().querySelectorAll('button')].find((b) => b.textContent?.trim() === text);
 
@@ -86,6 +90,35 @@ describe('Today', () => {
     button(`Delete ${bench.name}`)?.click();
 
     await shows([pullups]);
+  });
+
+  it('links each exercise to lifting it', async () => {
+    await plan(bench, pullups);
+
+    expect(element().querySelector(`a[href="/lift/${pullups.id}"]`)?.textContent).toContain(
+      pullups.name,
+    );
+  });
+
+  it('shows the sets done today, what was lifted last time, and how many lifts are done', async () => {
+    await sessions.add('2026-01-05', pullups);
+    await sessions.addSet((await db.sessions.get({ date: '2026-01-05' }))!, pullups.id, {
+      weight: 0,
+      reps: 10,
+    });
+    await plan(bench, pullups);
+    const today = (await db.sessions.get({ date: TuiDay.currentLocal().toJSON() }))!;
+    await sessions.addSet(today, bench.id, { weight: 80, reps: 8 });
+    await sessions.addSet(today, bench.id, { weight: 85, reps: 6 });
+
+    await vi.waitFor(async () => {
+      await render();
+      expect(element().querySelector('.progress')?.textContent).toBe('1 of 2 lifts done');
+      expect([...element().querySelectorAll('.summary')].map((item) => item.textContent)).toEqual([
+        '2 sets · 85 × 6',
+        'Last time 0 × 10',
+      ]);
+    });
   });
 
   describe('edit mode', () => {

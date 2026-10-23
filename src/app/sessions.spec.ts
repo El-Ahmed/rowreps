@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { TuiDay } from '@taiga-ui/cdk';
+import Dexie from 'dexie';
 import { db, Session } from './db';
 import { Exercise } from './exercises';
 import { Sessions } from './sessions';
@@ -25,6 +26,10 @@ describe('Sessions', () => {
   };
   let sessions: Sessions;
 
+  // How exercises are stored once added: with no sets yet.
+  const planned = (...exercises: Exercise[]) =>
+    exercises.map((exercise) => ({ ...exercise, sets: [] }));
+
   const stored = () => db.sessions.toArray();
   const session = (date: string) => db.sessions.get({ date }) as Promise<Session>;
 
@@ -35,7 +40,7 @@ describe('Sessions', () => {
   it('starts a session for the day with the first exercise', async () => {
     await sessions.add('2026-10-19', bench);
 
-    expect(await stored()).toEqual([{ id: 1, date: '2026-10-19', exercises: [bench] }]);
+    expect(await stored()).toEqual([{ id: 1, date: '2026-10-19', exercises: planned(bench) }]);
   });
 
   it('adds exercises in the order they were picked, once each', async () => {
@@ -43,7 +48,7 @@ describe('Sessions', () => {
     await sessions.add('2026-10-19', pullups);
     await sessions.add('2026-10-19', bench);
 
-    expect((await session('2026-10-19')).exercises).toEqual([bench, pullups]);
+    expect((await session('2026-10-19')).exercises).toEqual(planned(bench, pullups));
   });
 
   it('keeps each day in its own session', async () => {
@@ -61,7 +66,7 @@ describe('Sessions', () => {
     await vi.waitFor(() =>
       expect(sessions.all()?.map((item) => item.date)).toEqual([today, '2026-10-19']),
     );
-    expect(sessions.today()?.exercises).toEqual([squat]);
+    expect(sessions.today()?.exercises).toEqual(planned(squat));
   });
 
   it('removes an exercise', async () => {
@@ -69,7 +74,7 @@ describe('Sessions', () => {
     await sessions.add('2026-10-19', pullups);
     await sessions.remove(await session('2026-10-19'), bench);
 
-    expect((await session('2026-10-19')).exercises).toEqual([pullups]);
+    expect((await session('2026-10-19')).exercises).toEqual(planned(pullups));
   });
 
   it('deletes the session along with its last exercise', async () => {
@@ -88,7 +93,7 @@ describe('Sessions', () => {
     await sessions.remove(copy, bench);
     await sessions.remove(copy, pullups);
 
-    expect((await session('2026-10-19')).exercises).toEqual([squat]);
+    expect((await session('2026-10-19')).exercises).toEqual(planned(squat));
   });
 
   it('moves an exercise to a new position', async () => {
@@ -97,14 +102,14 @@ describe('Sessions', () => {
     await sessions.add('2026-10-19', squat);
     await sessions.move(await session('2026-10-19'), 0, 2);
 
-    expect((await session('2026-10-19')).exercises).toEqual([pullups, squat, bench]);
+    expect((await session('2026-10-19')).exercises).toEqual(planned(pullups, squat, bench));
   });
 
   it('changes the date of a session', async () => {
     await sessions.add('2026-10-19', bench);
     await sessions.changeDate(await session('2026-10-19'), '2026-10-17');
 
-    expect(await stored()).toEqual([{ id: 1, date: '2026-10-17', exercises: [bench] }]);
+    expect(await stored()).toEqual([{ id: 1, date: '2026-10-17', exercises: planned(bench) }]);
   });
 
   it('deletes a session', async () => {
@@ -113,5 +118,83 @@ describe('Sessions', () => {
     await sessions.delete(await session('2026-10-19'));
 
     expect((await stored()).map((item) => item.date)).toEqual(['2026-10-21']);
+  });
+
+  describe('sets and notes', () => {
+    beforeEach(async () => {
+      await sessions.add('2026-10-19', bench);
+      await sessions.add('2026-10-19', pullups);
+    });
+
+    const lift = async (exercise: Exercise) =>
+      (await session('2026-10-19')).exercises.find((item) => item.id === exercise.id)!;
+
+    it('logs sets in order on their exercise only', async () => {
+      await sessions.addSet(await session('2026-10-19'), bench.id, { weight: 80, reps: 8 });
+      await sessions.addSet(await session('2026-10-19'), bench.id, { weight: 82.5, reps: 6 });
+
+      expect((await lift(bench)).sets).toEqual([
+        { weight: 80, reps: 8 },
+        { weight: 82.5, reps: 6 },
+      ]);
+      expect((await lift(pullups)).sets).toEqual([]);
+    });
+
+    it('puts a set back where it was', async () => {
+      const copy = await session('2026-10-19');
+      await sessions.addSet(copy, bench.id, { weight: 80, reps: 8 });
+      await sessions.addSet(copy, bench.id, { weight: 80, reps: 6 });
+      await sessions.addSet(copy, bench.id, { weight: 75, reps: 10 }, 1);
+
+      expect((await lift(bench)).sets.map((set) => set.reps)).toEqual([8, 10, 6]);
+    });
+
+    it('changes and deletes a set', async () => {
+      const copy = await session('2026-10-19');
+      await sessions.addSet(copy, bench.id, { weight: 80, reps: 8 });
+      await sessions.addSet(copy, bench.id, { weight: 80, reps: 6 });
+
+      await sessions.changeSet(copy, bench.id, 1, { weight: 77.5, reps: 7 });
+      expect((await lift(bench)).sets).toEqual([
+        { weight: 80, reps: 8 },
+        { weight: 77.5, reps: 7 },
+      ]);
+
+      await sessions.deleteSet(copy, bench.id, 0);
+      expect((await lift(bench)).sets).toEqual([{ weight: 77.5, reps: 7 }]);
+    });
+
+    it('writes a note, trimmed, and removes it when emptied', async () => {
+      await sessions.changeNote(await session('2026-10-19'), bench.id, '  Reduce weight  ');
+      expect((await lift(bench)).note).toBe('Reduce weight');
+
+      await sessions.changeNote(await session('2026-10-19'), bench.id, ' ');
+      expect((await lift(bench)).note).toBeUndefined();
+    });
+
+    it('finds the last time an exercise was done with sets', async () => {
+      await sessions.addSet(await session('2026-10-19'), bench.id, { weight: 80, reps: 8 });
+      await sessions.add('2026-10-21', bench);
+      await sessions.add('2026-10-23', bench);
+
+      await vi.waitFor(() => expect(sessions.all()?.length).toBe(3));
+      expect(sessions.lastTime(bench.id, '2026-10-23')).toEqual({
+        date: '2026-10-19',
+        lift: { ...bench, sets: [{ weight: 80, reps: 8 }] },
+      });
+      expect(sessions.lastTime(bench.id, '2026-10-19')).toBeUndefined();
+      expect(sessions.lastTime(pullups.id, '2026-10-23')).toBeUndefined();
+    });
+  });
+
+  it('gives exercises saved before sets existed no sets', async () => {
+    await db.delete();
+    const old = new Dexie('rowreps');
+    old.version(1).stores({ sessions: '++id, &date' });
+    await old.table('sessions').add({ date: '2026-10-19', exercises: [bench] });
+    old.close();
+    await db.open();
+
+    expect(await stored()).toEqual([{ id: 1, date: '2026-10-19', exercises: planned(bench) }]);
   });
 });

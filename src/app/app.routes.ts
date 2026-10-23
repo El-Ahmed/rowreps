@@ -6,6 +6,11 @@ export const routes: Routes = [
   { path: '', component: Today, title: 'Today' },
   { path: 'add', component: AddExercise, title: 'Add exercise' },
   {
+    path: 'lift/:id',
+    loadComponent: () => import('./lift/lift').then((m) => m.LiftScreen),
+    title: 'Lift',
+  },
+  {
     path: 'history',
     loadComponent: () => import('./history/history').then((m) => m.SessionHistory),
     title: 'History',

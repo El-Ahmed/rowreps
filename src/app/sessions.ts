@@ -4,7 +4,7 @@ import { moveItemInArray } from '@angular/cdk/drag-drop';
 import { TuiDay } from '@taiga-ui/cdk';
 import { liveQuery } from 'dexie';
 import { from } from 'rxjs';
-import { db, Session } from './db';
+import { db, Lift, Session, WorkSet } from './db';
 import { Exercise } from './exercises';
 
 @Injectable({ providedIn: 'root' })
@@ -21,9 +21,11 @@ export class Sessions {
     return db.transaction('rw', db.sessions, async () => {
       const session = await db.sessions.get({ date });
       if (!session) {
-        await db.sessions.add({ date, exercises: [exercise] });
+        await db.sessions.add({ date, exercises: [{ ...exercise, sets: [] }] });
       } else if (!session.exercises.some((item) => item.id === exercise.id)) {
-        await db.sessions.update(session.id, { exercises: [...session.exercises, exercise] });
+        await db.sessions.update(session.id, {
+          exercises: [...session.exercises, { ...exercise, sets: [] }],
+        });
       }
     });
   }
@@ -42,6 +44,40 @@ export class Sessions {
     });
   }
 
+  // The exercise as done in the latest session before `date` that has sets of it.
+  lastTime(exerciseId: string, date: string): { date: string; lift: Lift } | undefined {
+    const done = (lift: Lift) => lift.id === exerciseId && lift.sets.length > 0;
+    const session = this.all()?.find((item) => item.date < date && item.exercises.some(done));
+    return session && { date: session.date, lift: session.exercises.find(done)! };
+  }
+
+  // Adds the set at the end, or at `index` to put a deleted set back.
+  addSet(session: Session, exerciseId: string, set: WorkSet, index?: number): Promise<void> {
+    return this.changeSets(session, exerciseId, (sets) => {
+      const copy = [...sets];
+      copy.splice(index ?? sets.length, 0, set);
+      return copy;
+    });
+  }
+
+  changeSet(session: Session, exerciseId: string, index: number, set: WorkSet): Promise<void> {
+    return this.changeSets(session, exerciseId, (sets) =>
+      sets.map((item, i) => (i === index ? set : item)),
+    );
+  }
+
+  deleteSet(session: Session, exerciseId: string, index: number): Promise<void> {
+    return this.changeSets(session, exerciseId, (sets) => sets.filter((_, i) => i !== index));
+  }
+
+  // An empty note removes it.
+  changeNote(session: Session, exerciseId: string, note: string): Promise<void> {
+    return this.changeLift(session, exerciseId, (lift) => ({
+      ...lift,
+      note: note.trim() || undefined,
+    }));
+  }
+
   async changeDate(session: Session, date: string): Promise<void> {
     await db.sessions.update(session.id, { date });
   }
@@ -52,10 +88,7 @@ export class Sessions {
 
   // Reads the stored exercises rather than the given copy, so quick taps don't undo each other.
   // A session left with no exercises is deleted, so history never shows an empty day.
-  private changeExercises(
-    session: Session,
-    change: (exercises: Exercise[]) => Exercise[],
-  ): Promise<void> {
+  private changeExercises(session: Session, change: (exercises: Lift[]) => Lift[]): Promise<void> {
     return db.transaction('rw', db.sessions, async () => {
       const stored = await db.sessions.get(session.id);
       if (!stored) {
@@ -66,5 +99,23 @@ export class Sessions {
         ? db.sessions.update(session.id, { exercises })
         : db.sessions.delete(session.id));
     });
+  }
+
+  private changeSets(
+    session: Session,
+    exerciseId: string,
+    change: (sets: WorkSet[]) => WorkSet[],
+  ): Promise<void> {
+    return this.changeLift(session, exerciseId, (lift) => ({ ...lift, sets: change(lift.sets) }));
+  }
+
+  private changeLift(
+    session: Session,
+    exerciseId: string,
+    change: (lift: Lift) => Lift,
+  ): Promise<void> {
+    return this.changeExercises(session, (exercises) =>
+      exercises.map((lift) => (lift.id === exerciseId ? change(lift) : lift)),
+    );
   }
 }

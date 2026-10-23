@@ -37,6 +37,9 @@ describe('AddExercise', () => {
   let fixture: ComponentFixture<AddExercise>;
   let sessions: Sessions;
   const today = () => TuiDay.currentLocal().toJSON();
+  // How exercises are stored once added: with no sets yet.
+  const planned = (...exercises: Exercise[]) =>
+    exercises.map((exercise) => ({ ...exercise, sets: [] }));
 
   const element = () => fixture.nativeElement as HTMLElement;
   const groups = () => [...element().querySelectorAll('h2')].map((h) => h.textContent?.trim());
@@ -120,7 +123,9 @@ describe('AddExercise', () => {
     options()[0].click();
 
     await vi.waitFor(() => expect(navigate).toHaveBeenCalledWith(['/']));
-    expect(await db.sessions.toArray()).toEqual([{ id: 1, date: today(), exercises: [bench] }]);
+    expect(await db.sessions.toArray()).toEqual([
+      { id: 1, date: today(), exercises: planned(bench) },
+    ]);
   });
 
   describe('for a past session', () => {
@@ -148,7 +153,7 @@ describe('AddExercise', () => {
 
       await vi.waitFor(() => expect(navigate).toHaveBeenCalledWith(['/history', '1']));
       expect(await db.sessions.toArray()).toEqual([
-        { id: 1, date: '2026-10-19', exercises: [squat, bench] },
+        { id: 1, date: '2026-10-19', exercises: planned(squat, bench) },
       ]);
     });
   });

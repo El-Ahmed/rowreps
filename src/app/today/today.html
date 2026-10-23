@@ -29,6 +29,9 @@
   <header class="heading">
     <p class="date">{{ date | date: 'EEEE d MMMM' }}</p>
     <h1>Today</h1>
+    @if (progress()) {
+      <p class="progress">{{ progress() }}</p>
+    }
   </header>
 
   @if (!exercises().length) {
@@ -59,9 +62,18 @@
       @for (exercise of exercises(); track exercise.id) {
         <li>
           <tui-swipe-actions>
-            <div class="row" tuiCell>
-              <span tuiTitle>{{ exercise.name }}</span>
-            </div>
+            <a class="row" tuiCell [routerLink]="['/lift', exercise.id]">
+              @if (exercise.sets.length) {
+                <tui-icon icon="@tui.check" class="done" />
+              }
+              <span tuiTitle>
+                {{ exercise.name }}
+                @if (summary(exercise); as summary) {
+                  <span tuiSubtitle class="summary">{{ summary }}</span>
+                }
+              </span>
+              <tui-icon icon="@tui.chevron-right" class="chevron" />
+            </a>
             <button
               tuiIconButton
               tuiSwipeAction

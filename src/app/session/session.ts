@@ -1,5 +1,6 @@
 import { Component, LOCALE_ID, computed, effect, inject, input, signal } from '@angular/core';
 import { formatDate } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 import { TuiDay } from '@taiga-ui/cdk';
@@ -9,17 +10,20 @@ import {
   TuiCell,
   TuiDialogService,
   TuiIcon,
+  TuiNumberFormat,
+  TuiTextfield,
   TuiTitle,
 } from '@taiga-ui/core';
-import { TUI_CONFIRM } from '@taiga-ui/kit';
+import { TUI_CONFIRM, TuiInputNumber, TuiTextarea } from '@taiga-ui/kit';
 import { TuiSheetDialog } from '@taiga-ui/addon-mobile';
 import { filter } from 'rxjs';
-import { Exercise } from '../exercises';
+import { Lift } from '../db';
 import { Sessions } from '../sessions';
 
 @Component({
   selector: 'app-session',
   imports: [
+    FormsModule,
     RouterLink,
     CdkDropList,
     CdkDrag,
@@ -28,8 +32,12 @@ import { Sessions } from '../sessions';
     TuiCalendar,
     TuiCell,
     TuiIcon,
-    TuiTitle,
+    TuiInputNumber,
+    TuiNumberFormat,
     TuiSheetDialog,
+    TuiTextarea,
+    TuiTextfield,
+    TuiTitle,
   ],
   templateUrl: './session.html',
   styleUrl: './session.css',
@@ -67,6 +75,22 @@ export class SessionLog {
       taken(day) && day.toJSON() !== this.session()?.date ? ['var(--tui-text-secondary)'] : [];
   });
 
+  // The set being changed in the sheet; a null index adds a new set.
+  protected readonly editingSet = signal(false);
+  protected readonly setTarget = signal<{ lift: Lift; index: number | null } | null>(null);
+  protected readonly setLabel = computed(() => {
+    const target = this.setTarget();
+    return target?.index === null ? 'Add a set' : `Set ${(target?.index ?? 0) + 1}`;
+  });
+  protected readonly weight = signal<number | null>(null);
+  protected readonly reps = signal<number | null>(null);
+  protected readonly validSet = computed(() => this.weight() !== null && !!this.reps());
+
+  protected readonly editingNote = signal(false);
+  protected readonly noteLift = signal<Lift | null>(null);
+  protected readonly noteLabel = computed(() => this.noteLift()?.name ?? '');
+  protected readonly note = signal('');
+
   constructor() {
     // Back to the list once the session is gone: deleted here, or never existed.
     effect(() => {
@@ -86,15 +110,50 @@ export class SessionLog {
     this.pickingDate.set(false);
   }
 
-  protected drop(event: CdkDragDrop<Exercise[]>): void {
+  protected drop(event: CdkDragDrop<Lift[]>): void {
     this.sessions.move(this.session()!, event.previousIndex, event.currentIndex);
   }
 
-  protected remove(exercise: Exercise): void {
+  protected remove(exercise: Lift): void {
     const session = this.session()!;
     this.confirm(`Delete ${exercise.name} from ${this.day(session.date)}?`, () =>
       this.sessions.remove(session, exercise),
     );
+  }
+
+  // A new set starts from the last one.
+  protected openSet(lift: Lift, index: number | null): void {
+    const set = lift.sets[index ?? lift.sets.length - 1];
+    this.setTarget.set({ lift, index });
+    this.weight.set(set?.weight ?? null);
+    this.reps.set(set?.reps ?? null);
+    this.editingSet.set(true);
+  }
+
+  protected async saveSet(): Promise<void> {
+    const { lift, index } = this.setTarget()!;
+    const set = { weight: this.weight()!, reps: this.reps()! };
+    await (index === null
+      ? this.sessions.addSet(this.session()!, lift.id, set)
+      : this.sessions.changeSet(this.session()!, lift.id, index, set));
+    this.editingSet.set(false);
+  }
+
+  protected async deleteSet(): Promise<void> {
+    const { lift, index } = this.setTarget()!;
+    await this.sessions.deleteSet(this.session()!, lift.id, index!);
+    this.editingSet.set(false);
+  }
+
+  protected openNote(lift: Lift): void {
+    this.noteLift.set(lift);
+    this.note.set(lift.note ?? '');
+    this.editingNote.set(true);
+  }
+
+  protected async saveNote(): Promise<void> {
+    await this.sessions.changeNote(this.session()!, this.noteLift()!.id, this.note());
+    this.editingNote.set(false);
   }
 
   protected deleteSession(): void {

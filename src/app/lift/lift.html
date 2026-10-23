@@ -17,19 +17,6 @@
       }
       <h1>{{ lift.name }}</h1>
       @switch (mode()) {
-        @case ('set') {
-          <button
-            tuiButton
-            type="button"
-            appearance="secondary-grayscale"
-            size="m"
-            class="pill"
-            [disabled]="!valid()"
-            (click)="toggleEditing()"
-          >
-            {{ editing() ? 'Done' : 'Edit' }}
-          </button>
-        }
         @case ('sets') {
           <button
             tuiButton
@@ -77,22 +64,23 @@
         </p>
       }
 
-      <!-- The numbers look the same while typing; Edit only makes them typable. -->
+      <!-- Always typable, drawn as the plain numbers. Enter moves on to reps, then closes the keyboard. -->
       <div class="numbers">
         <p class="weight-value">
           <tui-textfield
+            tuiTextfieldAppearance=""
             [tuiTextfieldCleaner]="false"
             class="inline"
             [tuiNumberFormat]="{ maximumFractionDigits: 2, minimumFractionDigits: 0 }"
           >
             <input
-              #weightInput
               tuiInputNumber
               aria-label="Weight (kg)"
               placeholder="0"
+              enterkeyhint="next"
               class="number"
               [min]="0"
-              [readOnly]="!editing()"
+              (keydown.enter)="repsInput.focus()"
               [style.inline-size]="width(weight())"
               [(ngModel)]="weight"
             />
@@ -102,17 +90,20 @@
         <p class="reps-value">
           <span class="number">×</span>
           <tui-textfield
+            tuiTextfieldAppearance=""
             [tuiTextfieldCleaner]="false"
             class="inline"
             [tuiNumberFormat]="{ maximumFractionDigits: 0 }"
           >
             <input
+              #repsInput
               tuiInputNumber
               aria-label="Reps"
               placeholder="0"
+              enterkeyhint="done"
               class="number"
               [min]="1"
-              [readOnly]="!editing()"
+              (keydown.enter)="repsInput.blur()"
               [style.inline-size]="width(reps())"
               [(ngModel)]="reps"
             />

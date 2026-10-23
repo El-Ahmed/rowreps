@@ -1,16 +1,4 @@
-import {
-  Component,
-  ElementRef,
-  Injector,
-  afterNextRender,
-  computed,
-  effect,
-  inject,
-  input,
-  linkedSignal,
-  signal,
-  viewChild,
-} from '@angular/core';
+import { Component, computed, effect, inject, input, linkedSignal, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -51,9 +39,7 @@ type Notice = { kind: 'logged'; index: number } | { kind: 'deleted'; index: numb
 export class LiftScreen {
   private readonly sessions = inject(Sessions);
   private readonly router = inject(Router);
-  private readonly injector = inject(Injector);
   private readonly date = TuiDay.currentLocal().toJSON();
-  private readonly weightInput = viewChild<ElementRef<HTMLInputElement>>('weightInput');
 
   // The exercise id, from /lift/:id. The lift is always one of today's exercises.
   readonly id = input.required<string>();
@@ -83,8 +69,6 @@ export class LiftScreen {
   protected readonly weight = linkedSignal<number | null>(() => this.suggested()?.weight ?? null);
   protected readonly reps = linkedSignal<number | null>(() => this.suggested()?.reps ?? null);
   protected readonly valid = computed(() => this.weight() !== null && !!this.reps());
-  // With nothing to start from, the numbers are typed in straight away.
-  protected readonly editing = linkedSignal(() => !this.suggested());
 
   // 'set' enters the next set, 'rest' follows a logged set,
   // 'sets' fixes the logged sets in place and 'note' writes the note.
@@ -134,24 +118,9 @@ export class LiftScreen {
     this.mode.set('rest');
   }
 
-  // Edit makes the numbers typable where they are, with the caret after the weight.
-  protected toggleEditing(): void {
-    this.editing.update((editing) => !editing);
-    if (this.editing()) {
-      afterNextRender(
-        () => {
-          const input = this.weightInput()!.nativeElement;
-          input.focus();
-          input.setSelectionRange(input.value.length, input.value.length);
-        },
-        { injector: this.injector },
-      );
-    }
-  }
-
   // Sizes a number field to its digits, so it reads like the plain number.
   protected width(value: number | null): string {
-    return `${Math.max(String(value ?? '').length, 1) + 0.25}ch`;
+    return `${Math.max(String(value ?? '').length, 1)}ch`;
   }
 
   protected async undo(): Promise<void> {

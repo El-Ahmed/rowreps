@@ -87,8 +87,8 @@ describe('LiftScreen', () => {
     it('asks for the weight and reps of set 1', () => {
       expect(text()).toContain('Set 1');
       expect(text()).not.toContain('Last time');
-      expect(weight().readOnly).toBe(false);
-      expect(reps().readOnly).toBe(false);
+      expect(weight().value).toBe('');
+      expect(reps().value).toBe('');
       expect(button('Log set')?.disabled).toBe(true);
     });
 
@@ -131,7 +131,6 @@ describe('LiftScreen', () => {
       expect(text()).toContain('Mon 5 Jan · Reduce weight next time');
       expect(weight().value).toBe('80');
       expect(reps().value).toBe('8');
-      expect(weight().readOnly).toBe(true);
     });
 
     it('compares each logged set with the same set last time', async () => {
@@ -140,13 +139,7 @@ describe('LiftScreen', () => {
 
       button('New set')?.click();
       await shows('Set 2 of 3');
-      button('Edit')?.click();
-      await render();
-      expect(weight().readOnly).toBe(false);
-      expect(document.activeElement).toBe(weight());
       type(weight(), '82.5');
-      await render();
-      button('Done')?.click();
       await render();
       button('Log set')?.click();
 
@@ -155,6 +148,22 @@ describe('LiftScreen', () => {
         { weight: 80, reps: 8 },
         { weight: 82.5, reps: 8 },
       ]);
+    });
+
+    it('has no Edit button: the numbers are always typable', () => {
+      expect(button('Edit')).toBeUndefined();
+      expect(weight().readOnly).toBe(false);
+      expect(reps().readOnly).toBe(false);
+    });
+
+    it('moves from weight to reps on Enter, then closes the keyboard', () => {
+      weight().focus();
+      weight().dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+      expect(document.activeElement).toBe(reps());
+
+      reps().dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+      expect(document.activeElement).not.toBe(reps());
+      expect(document.activeElement).not.toBe(weight());
     });
 
     it('takes a logged set back with Undo', async () => {

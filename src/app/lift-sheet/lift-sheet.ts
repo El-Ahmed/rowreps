@@ -51,12 +51,12 @@ export class LiftSheet {
     () =>
       `https://www.youtube.com/results?search_query=${encodeURIComponent(`${this.lift().name} proper form`)}`,
   );
-  // TikTok's website drops the search on phones, so iPhones open the TikTok app's search instead.
+  // TikTok's website drops the search on phones, so phones open the TikTok app's search instead.
   // The app link is undocumented and shows an error when TikTok isn't installed.
-  protected readonly ios = inject(TUI_PLATFORM) === 'ios';
+  protected readonly mobile = inject(TUI_PLATFORM) !== 'web';
   protected readonly tikTok = computed(() => {
     const search = encodeURIComponent(`${this.lift().name} form`);
-    return this.ios
+    return this.mobile
       ? `snssdk1233://search?keyword=${search}`
       : `https://www.tiktok.com/search?q=${search}`;
   });

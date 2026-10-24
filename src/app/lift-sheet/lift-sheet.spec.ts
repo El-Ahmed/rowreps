@@ -81,21 +81,6 @@ describe('LiftSheet', () => {
         'https://www.tiktok.com/search?q=Barbell%20Bench%20Press%20-%20Medium%20Grip%20form',
       ]);
     });
-  });
-
-  describe('on an iPhone', () => {
-    beforeEach(() => {
-      platform = 'ios';
-      return open(0);
-    });
-
-    it("searches in the TikTok app, since TikTok's website drops the search", () => {
-      const tikTok = element().querySelector<HTMLAnchorElement>('[aria-label^="Search TikTok"]')!;
-      expect(tikTok.getAttribute('href')).toBe(
-        'snssdk1233://search?keyword=Barbell%20Bench%20Press%20-%20Medium%20Grip%20form',
-      );
-      expect(tikTok.target).toBe('');
-    });
 
     it('has no progress yet', async () => {
       tab('Progress').click();
@@ -103,6 +88,22 @@ describe('LiftSheet', () => {
       expect(text()).toContain('No sets logged yet.');
       expect(element().querySelector('tui-line-chart')).toBeNull();
     });
+  });
+
+  describe('on a phone', () => {
+    const tikTok = () =>
+      element().querySelector<HTMLAnchorElement>('[aria-label^="Search TikTok"]')!;
+
+    for (const phone of ['ios', 'android'] as const) {
+      it(`searches in the TikTok app on ${phone}, since TikTok's website drops the search`, async () => {
+        platform = phone;
+        await open(0);
+        expect(tikTok().getAttribute('href')).toBe(
+          'snssdk1233://search?keyword=Barbell%20Bench%20Press%20-%20Medium%20Grip%20form',
+        );
+        expect(tikTok().target).toBe('');
+      });
+    }
   });
 
   describe('a lift logged before', () => {

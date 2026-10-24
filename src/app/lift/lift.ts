@@ -6,9 +6,10 @@ import { DatePipe } from '@angular/common';
 import { TuiDay } from '@taiga-ui/cdk';
 import { TuiButton, TuiIcon, TuiNumberFormat, TuiTextfield } from '@taiga-ui/core';
 import { TuiBadge, TuiInputNumber, TuiProgressCircle, TuiTextarea } from '@taiga-ui/kit';
-import { TuiSwipeActions } from '@taiga-ui/addon-mobile';
+import { TuiSheetDialog, TuiSwipeActions } from '@taiga-ui/addon-mobile';
 import { interval } from 'rxjs';
 import { WorkSet } from '../db';
+import { LiftSheet } from '../lift-sheet/lift-sheet';
 import { Sessions } from '../sessions';
 
 // How long the rest after a set starts at, and how much a tap on the timer adds.
@@ -22,6 +23,7 @@ type Notice = { kind: 'logged'; index: number } | { kind: 'deleted'; index: numb
   imports: [
     DatePipe,
     FormsModule,
+    LiftSheet,
     RouterLink,
     TuiBadge,
     TuiButton,
@@ -29,6 +31,7 @@ type Notice = { kind: 'logged'; index: number } | { kind: 'deleted'; index: numb
     TuiInputNumber,
     TuiNumberFormat,
     TuiProgressCircle,
+    TuiSheetDialog,
     TuiSwipeActions,
     TuiTextarea,
     TuiTextfield,
@@ -91,6 +94,9 @@ export class LiftScreen {
 
   protected readonly drafts = signal<WorkSet[]>([]);
   protected readonly note = signal('');
+
+  // The sheet with how to do the lift and its progress so far.
+  protected readonly sheetOpen = signal(false);
 
   constructor() {
     interval(1000)

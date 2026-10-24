@@ -185,6 +185,20 @@ describe('Sessions', () => {
       expect(sessions.lastTime(bench.id, '2026-10-19')).toBeUndefined();
       expect(sessions.lastTime(pullups.id, '2026-10-23')).toBeUndefined();
     });
+
+    it('lists the sessions an exercise was done with sets, newest first', async () => {
+      await sessions.addSet(await session('2026-10-19'), bench.id, { weight: 80, reps: 8 });
+      await sessions.add('2026-10-21', bench);
+      await sessions.add('2026-10-23', bench);
+      await sessions.addSet(await session('2026-10-23'), bench.id, { weight: 85, reps: 6 });
+
+      await vi.waitFor(() => expect(sessions.history(bench.id).length).toBe(2));
+      expect(sessions.history(bench.id).map((item) => item.date)).toEqual([
+        '2026-10-23',
+        '2026-10-19',
+      ]);
+      expect(sessions.history(pullups.id)).toEqual([]);
+    });
   });
 
   it('gives exercises saved before sets existed no sets', async () => {

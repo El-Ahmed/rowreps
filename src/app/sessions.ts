@@ -44,11 +44,17 @@ export class Sessions {
     });
   }
 
+  // The exercise as done in each session that has sets of it, newest first.
+  history(exerciseId: string): { date: string; lift: Lift }[] {
+    return (this.all() ?? []).flatMap((session) => {
+      const lift = session.exercises.find((item) => item.id === exerciseId && item.sets.length);
+      return lift ? [{ date: session.date, lift }] : [];
+    });
+  }
+
   // The exercise as done in the latest session before `date` that has sets of it.
   lastTime(exerciseId: string, date: string): { date: string; lift: Lift } | undefined {
-    const done = (lift: Lift) => lift.id === exerciseId && lift.sets.length > 0;
-    const session = this.all()?.find((item) => item.date < date && item.exercises.some(done));
-    return session && { date: session.date, lift: session.exercises.find(done)! };
+    return this.history(exerciseId).find((item) => item.date < date);
   }
 
   // Adds the set at the end, or at `index` to put a deleted set back.

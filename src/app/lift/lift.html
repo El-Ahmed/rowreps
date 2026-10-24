@@ -268,7 +268,10 @@
     }
   </main>
 
-  <ng-template [(tuiSheetDialog)]="sheetOpen" [tuiSheetDialogOptions]="{ label: lift.name }">
+  <ng-template
+    [(tuiSheetDialog)]="sheetOpen"
+    [tuiSheetDialogOptions]="{ label: lift.name, appearance: 'fullscreen' }"
+  >
     <app-lift-sheet [lift]="lift" />
   </ng-template>
 }

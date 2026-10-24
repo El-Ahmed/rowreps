@@ -4,6 +4,7 @@ import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { TuiAxes } from '@taiga-ui/addon-charts/components/axes';
 import { TuiLineChart } from '@taiga-ui/addon-charts/components/line-chart';
+import { TUI_PLATFORM } from '@taiga-ui/cdk';
 import { TuiButton } from '@taiga-ui/core';
 import { TuiSegmented } from '@taiga-ui/kit';
 import { Lift } from '../db';
@@ -50,9 +51,15 @@ export class LiftSheet {
     () =>
       `https://www.youtube.com/results?search_query=${encodeURIComponent(`${this.lift().name} proper form`)}`,
   );
-  protected readonly tikTok = computed(
-    () => `https://www.tiktok.com/search?q=${encodeURIComponent(`${this.lift().name} form`)}`,
-  );
+  // TikTok's website drops the search on phones, so iPhones open the TikTok app's search instead.
+  // The app link is undocumented and shows an error when TikTok isn't installed.
+  protected readonly ios = inject(TUI_PLATFORM) === 'ios';
+  protected readonly tikTok = computed(() => {
+    const search = encodeURIComponent(`${this.lift().name} form`);
+    return this.ios
+      ? `snssdk1233://search?keyword=${search}`
+      : `https://www.tiktok.com/search?q=${search}`;
+  });
 
   // The heaviest set of each session, oldest first, as [session, kg] chart points.
   protected readonly points = computed(() =>

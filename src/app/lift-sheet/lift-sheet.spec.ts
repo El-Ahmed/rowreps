@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TUI_PLATFORM } from '@taiga-ui/cdk';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { WorkSet, db } from '../db';
@@ -15,6 +16,7 @@ describe('LiftSheet', () => {
   };
   let fixture: ComponentFixture<LiftSheet>;
   let sessions: Sessions;
+  let platform: 'ios' | 'android' | 'web';
 
   const element = () => fixture.nativeElement as HTMLElement;
   // The words of each element found, with a space between the words of separate elements.
@@ -52,8 +54,13 @@ describe('LiftSheet', () => {
   }
 
   beforeEach(() => {
+    platform = 'web';
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: TUI_PLATFORM, useFactory: () => platform },
+      ],
     });
     sessions = TestBed.inject(Sessions);
   });
@@ -73,6 +80,21 @@ describe('LiftSheet', () => {
         'https://www.youtube.com/results?search_query=Barbell%20Bench%20Press%20-%20Medium%20Grip%20proper%20form',
         'https://www.tiktok.com/search?q=Barbell%20Bench%20Press%20-%20Medium%20Grip%20form',
       ]);
+    });
+  });
+
+  describe('on an iPhone', () => {
+    beforeEach(() => {
+      platform = 'ios';
+      return open(0);
+    });
+
+    it("searches in the TikTok app, since TikTok's website drops the search", () => {
+      const tikTok = element().querySelector<HTMLAnchorElement>('[aria-label^="Search TikTok"]')!;
+      expect(tikTok.getAttribute('href')).toBe(
+        'snssdk1233://search?keyword=Barbell%20Bench%20Press%20-%20Medium%20Grip%20form',
+      );
+      expect(tikTok.target).toBe('');
     });
 
     it('has no progress yet', async () => {

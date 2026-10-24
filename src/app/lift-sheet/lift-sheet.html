@@ -58,8 +58,8 @@
         appearance="secondary-grayscale"
         size="l"
         iconEnd="@tui.external-link"
-        target="_blank"
         rel="noopener"
+        [attr.target]="ios ? null : '_blank'"
         [href]="tikTok()"
         [attr.aria-label]="'Search TikTok for ' + lift().name"
       >

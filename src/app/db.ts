@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie';
-import { Exercise } from './exercises';
+import type { Exercise } from './exercises';
 
 // One logged set: the weight in kg, and how many reps were done with it.
 export interface WorkSet {
@@ -22,6 +22,7 @@ export interface Session {
 
 export const db = new Dexie('rowreps') as Dexie & {
   sessions: EntityTable<Session, 'id'>;
+  exercises: EntityTable<Exercise, 'id'>;
 };
 
 db.version(1).stores({ sessions: '++id, &date' });
@@ -36,3 +37,5 @@ db.version(2)
         session.exercises = session.exercises.map((exercise) => ({ ...exercise, sets: [] }));
       }),
   );
+// Version 3 keeps the exercises the user creates, next to the free-exercise-db ones.
+db.version(3).stores({ sessions: '++id, &date', exercises: '&id' });

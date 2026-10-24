@@ -1,0 +1,90 @@
+.screen {
+  min-block-size: 100dvh;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  block-size: 3.5rem;
+}
+
+.back {
+  border-radius: 100%;
+}
+
+.back::before {
+  font-size: 1.25rem;
+}
+
+h1 {
+  margin: 0.5rem 0 0;
+  font: var(--tui-typography-heading-h4);
+}
+
+.name {
+  margin-block-start: 1.25rem;
+  border-radius: 1rem;
+  font: var(--tui-typography-ui-l);
+  font-weight: 600;
+}
+
+h2 {
+  margin: 1.5rem 0 0.5rem;
+  padding-inline: 0.5rem;
+  font: var(--tui-typography-body-s);
+  font-weight: 700;
+  color: var(--tui-text-secondary);
+}
+
+.groups {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.groups .option {
+  justify-content: center;
+  min-block-size: 3rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+}
+
+/* The seventh group fills the last row on its own. */
+.groups .option:last-child {
+  grid-column: 1 / -1;
+}
+
+.muscles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.muscles .option {
+  min-block-size: 2.75rem;
+  padding-inline: 1rem;
+  border-radius: 1.375rem;
+  font-weight: 600;
+}
+
+/* A picked group or muscle is filled in the accent, like the design. */
+.option input[tuiBlock]:checked {
+  background: var(--tui-background-accent-1);
+}
+
+.option:has(input:checked) {
+  color: var(--tui-text-primary-on-accent-1);
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  margin-block-start: auto;
+  padding-block-start: 1.5rem;
+}
+
+.main {
+  inline-size: 100%;
+  border-radius: 1rem;
+}

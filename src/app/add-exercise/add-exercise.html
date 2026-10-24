@@ -42,8 +42,35 @@
       }
     </div>
   } @empty {
-    @if (query().trim()) {
-      <p class="hint">No exercise called "{{ query().trim() }}" yet.</p>
+    @if (name()) {
+      <p class="hint">No exercise called "{{ name() }}" yet.</p>
     }
+  }
+
+  @if (canCreate()) {
+    <div class="card create">
+      <a tuiCell class="row" [routerLink]="newExercise()" [queryParams]="{ name: name() }">
+        <span tuiAvatar="@tui.plus" appearance="primary" size="s"></span>
+        <span tuiTitle>
+          Create "{{ name() }}"
+          <span tuiSubtitle>New exercise</span>
+        </span>
+        <tui-icon icon="@tui.chevron-right" class="chevron" />
+      </a>
+    </div>
+  }
+
+  @if (closeMatches().length) {
+    <h2>Close matches</h2>
+    <div class="card">
+      @for (exercise of closeMatches(); track exercise.id) {
+        <button tuiCell type="button" class="row" (click)="add(exercise)">
+          <span tuiTitle>
+            {{ exercise.name }}
+            <span tuiSubtitle>{{ muscles(exercise) }}</span>
+          </span>
+        </button>
+      }
+    </div>
   }
 </main>

@@ -72,8 +72,18 @@ h2 {
   margin-block-start: 0;
 }
 
-.chevron {
+.suggestion {
+  min-block-size: 3.5rem;
+}
+
+.chevron,
+.date {
   flex-shrink: 0;
   margin-inline-start: auto;
   color: var(--tui-text-secondary);
+}
+
+.date {
+  font: var(--tui-typography-body-m);
+  font-variant-numeric: tabular-nums;
 }

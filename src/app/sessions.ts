@@ -57,6 +57,31 @@ export class Sessions {
     return this.history(exerciseId).find((item) => item.date < date);
   }
 
+  // Each exercise done on a day other than `date`, with the last day it was done, most recent first.
+  recent(date: string): { id: string; date: string }[] {
+    const last = new Map<string, string>();
+    this.others(date).forEach((session) =>
+      session.exercises.forEach((lift) => {
+        if (!last.has(lift.id)) {
+          last.set(lift.id, session.date);
+        }
+      }),
+    );
+    return [...last].map(([id, date]) => ({ id, date }));
+  }
+
+  // The exercises done on the last day each of `ids` was done, other than `date`, most recent first.
+  often(date: string, ids: string[]): { id: string; date: string }[] {
+    const recent = this.recent(date);
+    const lastDays = recent.filter((item) => ids.includes(item.id)).map((item) => item.date);
+    const together = new Set(
+      this.others(date)
+        .filter((session) => lastDays.includes(session.date))
+        .flatMap((session) => session.exercises.map((lift) => lift.id)),
+    );
+    return recent.filter((item) => together.has(item.id) && !ids.includes(item.id));
+  }
+
   // Adds the set at the end, or at `index` to put a deleted set back.
   addSet(session: Session, exerciseId: string, set: WorkSet, index?: number): Promise<void> {
     return this.changeSets(session, exerciseId, (sets) => {
@@ -90,6 +115,11 @@ export class Sessions {
 
   delete(session: Session): Promise<void> {
     return db.sessions.delete(session.id);
+  }
+
+  // The sessions on days other than `date`, newest first.
+  private others(date: string): Session[] {
+    return (this.all() ?? []).filter((session) => session.date !== date);
   }
 
   // Reads the stored exercises rather than the given copy, so quick taps don't undo each other.

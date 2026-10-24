@@ -201,6 +201,75 @@ describe('Sessions', () => {
     });
   });
 
+  describe('recent and often', () => {
+    const curl: Exercise = {
+      id: 'Barbell_Curl',
+      name: 'Barbell Curl',
+      primaryMuscles: ['biceps'],
+      secondaryMuscles: ['forearms'],
+    };
+
+    // Starts a session on the date with the exercises, each with one set.
+    async function log(date: string, ...exercises: Exercise[]): Promise<void> {
+      for (const exercise of exercises) {
+        await sessions.add(date, exercise);
+        await sessions.addSet(await session(date), exercise.id, { weight: 50, reps: 10 });
+      }
+    }
+
+    it('lists each exercise once with the last day it was done, most recent first', async () => {
+      await log('2026-10-16', squat, bench);
+      await log('2026-10-19', bench, pullups);
+
+      await vi.waitFor(() =>
+        expect(sessions.recent('2026-10-24')).toEqual([
+          { id: bench.id, date: '2026-10-19' },
+          { id: pullups.id, date: '2026-10-19' },
+          { id: squat.id, date: '2026-10-16' },
+        ]),
+      );
+    });
+
+    it('leaves out the given day, and counts exercises with no sets', async () => {
+      await log('2026-10-19', bench);
+      await sessions.add('2026-10-19', pullups);
+      await log('2026-10-24', squat);
+
+      await vi.waitFor(() =>
+        expect(sessions.recent('2026-10-24')).toEqual([
+          { id: bench.id, date: '2026-10-19' },
+          { id: pullups.id, date: '2026-10-19' },
+        ]),
+      );
+    });
+
+    it('finds what was done the last time an exercise was done, not before', async () => {
+      await log('2026-10-12', bench, curl);
+      await log('2026-10-19', bench, pullups);
+
+      await vi.waitFor(() =>
+        expect(sessions.often('2026-10-24', [bench.id])).toEqual([
+          { id: pullups.id, date: '2026-10-19' },
+        ]),
+      );
+      expect(sessions.often('2026-10-24', [])).toEqual([]);
+    });
+
+    it('finds what was done the last time each exercise was done, sets or not', async () => {
+      await log('2026-10-16', squat);
+      await sessions.add('2026-10-16', pullups);
+      await sessions.add('2026-10-19', bench);
+      await sessions.add('2026-10-19', curl);
+
+      await vi.waitFor(() =>
+        expect(sessions.often('2026-10-24', [bench.id, squat.id])).toEqual([
+          { id: curl.id, date: '2026-10-19' },
+          { id: pullups.id, date: '2026-10-16' },
+        ]),
+      );
+    });
+  });
+
   it('gives exercises saved before sets existed no sets', async () => {
     await db.delete();
     const old = new Dexie('rowreps');

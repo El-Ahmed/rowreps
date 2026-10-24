@@ -21,6 +21,7 @@
   <tui-textfield iconStart="@tui.search" [tuiTextfieldCleaner]="true" class="search">
     <input
       tuiInput
+      #searchInput
       tuiAutoFocus
       type="text"
       placeholder="Search all exercises"
@@ -29,21 +30,45 @@
     />
   </tui-textfield>
 
-  @for (group of groups(); track group.name) {
-    <h2>{{ group.name }}</h2>
+  @for (section of suggestions(); track section.name) {
+    <h2>{{ section.name }}</h2>
     <div class="card">
-      @for (exercise of group.exercises; track exercise.id) {
-        <button tuiCell type="button" class="row" (click)="add(exercise)">
-          <span tuiTitle>
-            {{ exercise.name }}
-            <span tuiSubtitle>{{ muscles(exercise) }}</span>
-          </span>
+      @for (item of section.items; track item.exercise.id) {
+        <button tuiCell type="button" class="row suggestion" (click)="add(item.exercise)">
+          <span tuiTitle>{{ item.exercise.name }}</span>
+          <span class="date">{{ item.date | date: 'EEE d MMM' }}</span>
         </button>
+      }
+      @if ($last) {
+        <a
+          tuiCell
+          class="row suggestion"
+          [routerLink]="addLink()"
+          [queryParams]="{ browse: true }"
+          (click)="searchInput.focus()"
+        >
+          <span tuiTitle>Browse by muscle group</span>
+          <tui-icon icon="@tui.chevron-right" class="chevron" />
+        </a>
       }
     </div>
   } @empty {
-    @if (name()) {
-      <p class="hint">No exercise called "{{ name() }}" yet.</p>
+    @for (group of groups(); track group.name) {
+      <h2>{{ group.name }}</h2>
+      <div class="card">
+        @for (exercise of group.exercises; track exercise.id) {
+          <button tuiCell type="button" class="row" (click)="add(exercise)">
+            <span tuiTitle>
+              {{ exercise.name }}
+              <span tuiSubtitle>{{ muscles(exercise) }}</span>
+            </span>
+          </button>
+        }
+      </div>
+    } @empty {
+      @if (name()) {
+        <p class="hint">No exercise called "{{ name() }}" yet.</p>
+      }
     }
   }
 

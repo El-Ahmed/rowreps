@@ -180,6 +180,109 @@ describe('AddExercise', () => {
     ]);
   });
 
+  describe('after some workouts', () => {
+    // Starts a session on the date with the exercises, each with one set.
+    async function log(date: string, ...exercises: Exercise[]): Promise<void> {
+      for (const exercise of exercises) {
+        await sessions.add(date, exercise);
+        const session = await db.sessions.get({ date });
+        await sessions.addSet(session!, exercise.id, { weight: 50, reps: 10 });
+      }
+    }
+
+    const dates = () =>
+      [...element().querySelectorAll('.date')].map((date) => date.textContent?.trim());
+    const browseLink = () =>
+      [...element().querySelectorAll('a')].find((a) => a.textContent?.includes('Browse'));
+
+    beforeEach(async () => {
+      await log('2026-10-16', squat);
+      await log('2026-10-19', bench, pullups);
+      await vi.waitFor(async () => {
+        await render();
+        expect(optionNames()).toEqual([bench.name, pullups.name, squat.name]);
+      });
+    });
+
+    it('suggests the recent exercises with the last day each was done', () => {
+      expect(groups()).toEqual(['Recent']);
+      expect(dates()).toEqual(['Mon 19 Oct', 'Mon 19 Oct', 'Fri 16 Oct']);
+    });
+
+    it('links to every exercise by muscle group', () => {
+      expect(browseLink()?.getAttribute('href')).toBe('/add?browse=true');
+    });
+
+    it('focuses the search when browsing by muscle group', async () => {
+      vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+      const input = element().querySelector('input') as HTMLInputElement;
+      input.blur();
+
+      browseLink()?.click();
+
+      expect(document.activeElement).toBe(input);
+    });
+
+    it('lists every exercise by muscle group when browsing, and goes back to the suggestions', async () => {
+      fixture.componentRef.setInput('browse', true);
+      await render();
+
+      expect(groups()).toEqual(['Chest', 'Lats', 'Quadriceps']);
+      expect(element().querySelector('a')?.getAttribute('href')).toBe('/add');
+    });
+
+    it('searches all exercises once something is typed', async () => {
+      await search('squat');
+
+      expect(groups()).toEqual(['Quadriceps']);
+      expect(browseLink()).toBeUndefined();
+    });
+
+    it('suggests what was done on the same days as the exercises already picked', async () => {
+      await sessions.add(today(), bench);
+
+      await vi.waitFor(async () => {
+        await render();
+        expect(groups()).toEqual(['Often on the same days', 'Recent']);
+      });
+      expect(optionNames()).toEqual([pullups.name, squat.name]);
+    });
+
+    it('suggests seven exercises in all', async () => {
+      const created = Array.from({ length: 8 }, (_, i) => ({
+        ...squat,
+        id: `created-${i}`,
+        name: `Exercise ${i}`,
+      }));
+      await db.exercises.bulkAdd(created);
+      await log('2026-10-21', ...created);
+
+      await vi.waitFor(async () => {
+        await render();
+        expect(optionNames()).toEqual(created.slice(0, 7).map((exercise) => exercise.name));
+      });
+    });
+
+    it('adds the suggested exercise to today and goes back', async () => {
+      const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+
+      options()[2].click();
+
+      await vi.waitFor(() => expect(navigate).toHaveBeenCalledWith(['/']));
+      expect((await db.sessions.get({ date: today() }))?.exercises).toEqual(planned(squat));
+    });
+
+    it("for a past session, leaves out that day's exercises", async () => {
+      fixture.componentRef.setInput('id', '2');
+      await vi.waitFor(async () => {
+        await render();
+        expect(groups()).toEqual(['Recent']);
+        expect(optionNames()).toEqual([squat.name]);
+      });
+      expect(browseLink()?.getAttribute('href')).toBe('/history/2/add?browse=true');
+    });
+  });
+
   describe('for a past session', () => {
     beforeEach(async () => {
       await sessions.add('2026-10-19', squat);

@@ -21,6 +21,7 @@
   <tui-textfield iconStart="@tui.search" [tuiTextfieldCleaner]="true" class="search">
     <input
       tuiInput
+      #searchInput
       tuiAutoFocus
       type="text"
       placeholder="Search all exercises"
@@ -39,7 +40,13 @@
         </button>
       }
       @if ($last) {
-        <a tuiCell class="row suggestion" [routerLink]="addLink()" [queryParams]="{ browse: true }">
+        <a
+          tuiCell
+          class="row suggestion"
+          [routerLink]="addLink()"
+          [queryParams]="{ browse: true }"
+          (click)="searchInput.focus()"
+        >
           <span tuiTitle>Browse by muscle group</span>
           <tui-icon icon="@tui.chevron-right" class="chevron" />
         </a>

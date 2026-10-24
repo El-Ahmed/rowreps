@@ -13,8 +13,7 @@ import { Sessions } from '../sessions';
 const FEW_RESULTS = 3;
 // How many close matches to show when nothing matches.
 const CLOSE_MATCHES = 5;
-// How many exercises done on the same days to suggest, and how many suggestions in all.
-const OFTEN = 3;
+// How many recent exercises to suggest, counting the ones done on the same days.
 const SUGGESTIONS = 7;
 
 const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
@@ -105,18 +104,18 @@ export class AddExercise {
           .slice(0, CLOSE_MATCHES),
   );
 
-  // Before any search: what was done on the same days as the session's exercises, then what was
-  // done last, each with the last day it was done.
+  // Before any search: what was done the last time each of the session's exercises was done,
+  // then what was done last, each with the last day it was done.
   protected readonly suggestions = computed(() => {
     const date = this.date();
     if (!date || this.name() || this.browse()) {
       return [];
     }
     const ids = this.session()?.exercises.map((exercise) => exercise.id) ?? [];
-    const often = this.suggested(this.sessions.often(date, ids)).slice(0, OFTEN);
+    const often = this.suggested(this.sessions.often(date, ids));
     const recent = this.suggested(this.sessions.recent(date))
       .filter((item) => !often.some((suggestion) => suggestion.exercise === item.exercise))
-      .slice(0, SUGGESTIONS - often.length);
+      .slice(0, Math.max(SUGGESTIONS - often.length, 0));
 
     return [
       { name: 'Often on the same days', items: often },

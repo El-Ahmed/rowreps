@@ -230,29 +230,43 @@ describe('Sessions', () => {
       );
     });
 
-    it('leaves out the given day and exercises that were never logged', async () => {
+    it('leaves out the given day, and counts exercises with no sets', async () => {
       await log('2026-10-19', bench);
       await sessions.add('2026-10-19', pullups);
       await log('2026-10-24', squat);
 
-      await vi.waitFor(() => expect(sessions.all()?.length).toBe(2));
-      await vi.waitFor(() => expect(sessions.all()?.[0].exercises[0].sets.length).toBe(1));
-      expect(sessions.recent('2026-10-24')).toEqual([{ id: bench.id, date: '2026-10-19' }]);
+      await vi.waitFor(() =>
+        expect(sessions.recent('2026-10-24')).toEqual([
+          { id: bench.id, date: '2026-10-19' },
+          { id: pullups.id, date: '2026-10-19' },
+        ]),
+      );
     });
 
-    it('finds the exercises done on the same days, most days in common first', async () => {
+    it('finds what was done the last time an exercise was done, not before', async () => {
       await log('2026-10-12', bench, curl);
-      await log('2026-10-14', bench, curl);
-      await log('2026-10-16', squat);
       await log('2026-10-19', bench, pullups);
 
       await vi.waitFor(() =>
         expect(sessions.often('2026-10-24', [bench.id])).toEqual([
-          { id: curl.id, date: '2026-10-14' },
           { id: pullups.id, date: '2026-10-19' },
         ]),
       );
       expect(sessions.often('2026-10-24', [])).toEqual([]);
+    });
+
+    it('finds what was done the last time each exercise was done, sets or not', async () => {
+      await log('2026-10-16', squat);
+      await sessions.add('2026-10-16', pullups);
+      await sessions.add('2026-10-19', bench);
+      await sessions.add('2026-10-19', curl);
+
+      await vi.waitFor(() =>
+        expect(sessions.often('2026-10-24', [bench.id, squat.id])).toEqual([
+          { id: curl.id, date: '2026-10-19' },
+          { id: pullups.id, date: '2026-10-16' },
+        ]),
+      );
     });
   });
 

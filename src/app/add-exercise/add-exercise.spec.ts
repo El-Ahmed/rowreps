@@ -213,6 +213,16 @@ describe('AddExercise', () => {
       expect(browseLink()?.getAttribute('href')).toBe('/add?browse=true');
     });
 
+    it('focuses the search when browsing by muscle group', async () => {
+      vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+      const input = element().querySelector('input') as HTMLInputElement;
+      input.blur();
+
+      browseLink()?.click();
+
+      expect(document.activeElement).toBe(input);
+    });
+
     it('lists every exercise by muscle group when browsing, and goes back to the suggestions', async () => {
       fixture.componentRef.setInput('browse', true);
       await render();

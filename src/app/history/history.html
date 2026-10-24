@@ -14,6 +14,38 @@
 
   <h1>History</h1>
 
+  @if (groups().length) {
+    <section class="muscles" aria-labelledby="muscles-title">
+      <h2 id="muscles-title">Muscles worked</h2>
+      <tui-segmented size="l" class="periods" [(activeItemIndex)]="period">
+        @for (item of periods; track item.days) {
+          <button type="button">{{ item.name }}</button>
+        }
+      </tui-segmented>
+      <app-muscle-figure [primary]="aLot()" [secondary]="some()" />
+      <ul class="legend">
+        <li><span class="dot" aria-hidden="true"></span>A lot</li>
+        <li><span class="dot some" aria-hidden="true"></span>Some</li>
+        <li><span class="dot none" aria-hidden="true"></span>None</li>
+      </ul>
+      @if (worked().length) {
+        <ul class="worked">
+          @for (item of worked(); track item.muscle) {
+            <li tuiChip appearance="neutral" size="m">
+              <span class="muscle">{{ item.name }}</span>
+              <span class="sets">{{ item.sets | i18nPlural: setCount }}</span>
+            </li>
+          }
+        </ul>
+        @if (notTrained()) {
+          <p class="not-trained"><span class="secondary">Not trained:</span> {{ notTrained() }}</p>
+        }
+      } @else {
+        <p class="secondary">No sets logged in the {{ periods[period()].name.toLowerCase() }}.</p>
+      }
+    </section>
+  }
+
   @for (group of groups(); track group.name) {
     <h2>{{ group.name }}</h2>
     <ul class="card">

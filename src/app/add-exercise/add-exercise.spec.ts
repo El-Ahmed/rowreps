@@ -27,6 +27,12 @@ describe('AddExercise', () => {
     primaryMuscles: ['quadriceps'],
     secondaryMuscles: ['calves', 'glutes', 'hamstrings', 'shoulders'],
   };
+  const frontSquat: Exercise = {
+    id: 'Front_Barbell_Squat',
+    name: 'Front Barbell Squat',
+    primaryMuscles: ['quadriceps'],
+    secondaryMuscles: ['glutes', 'hamstrings'],
+  };
   const pullups: Exercise = {
     id: 'Pullups',
     name: 'Pullups',
@@ -67,7 +73,7 @@ describe('AddExercise', () => {
     fixture = TestBed.createComponent(AddExercise);
     TestBed.inject(HttpTestingController)
       .expectOne('free-exercise-db/exercises.json')
-      .flush([bench, squat, gobletSquat, pullups]);
+      .flush([bench, squat, gobletSquat, frontSquat, pullups]);
     await render();
   });
 
@@ -77,7 +83,13 @@ describe('AddExercise', () => {
 
   it('lists every exercise grouped by primary muscle, groups in alphabetical order', () => {
     expect(groups()).toEqual(['Chest', 'Lats', 'Quadriceps']);
-    expect(optionNames()).toEqual([bench.name, pullups.name, squat.name, gobletSquat.name]);
+    expect(optionNames()).toEqual([
+      bench.name,
+      pullups.name,
+      squat.name,
+      gobletSquat.name,
+      frontSquat.name,
+    ]);
   });
 
   it('shows the primary then secondary muscles each exercise works', () => {
@@ -92,7 +104,7 @@ describe('AddExercise', () => {
     await search('SQU');
 
     expect(groups()).toEqual(['Quadriceps']);
-    expect(optionNames()).toEqual([squat.name, gobletSquat.name]);
+    expect(optionNames()).toEqual([squat.name, gobletSquat.name, frontSquat.name]);
   });
 
   it('matches the start of each typed word, in any order', async () => {
@@ -101,11 +113,51 @@ describe('AddExercise', () => {
     expect(optionNames()).toEqual([bench.name]);
   });
 
-  it('says so when nothing matches', async () => {
+  const createLink = () => element().querySelector<HTMLAnchorElement>('a[tuiCell]');
+
+  it('says so when nothing matches, and offers to create it', async () => {
+    await search('Belt squat ');
+
+    expect(element().textContent).toContain('No exercise called "Belt squat" yet.');
+    expect(createLink()?.textContent).toContain('Create "Belt squat"');
+    expect(createLink()?.getAttribute('href')).toBe('/add/new?name=Belt%20squat');
+  });
+
+  it('shows the exercises that match some of the words as close matches', async () => {
     await search('Belt squat');
 
-    expect(options()).toEqual([]);
-    expect(element().textContent).toContain('No exercise called "Belt squat" yet.');
+    expect(groups()).toEqual(['Close matches']);
+    expect(optionNames()).toEqual([squat.name, gobletSquat.name, frontSquat.name]);
+  });
+
+  it('offers to create the exercise below a few results', async () => {
+    await search('front');
+
+    expect(optionNames()).toEqual([frontSquat.name]);
+    expect(createLink()?.textContent).toContain('Create "front"');
+  });
+
+  it('does not offer to create it when there are enough results', async () => {
+    await search('squat');
+
+    expect(createLink()).toBeNull();
+  });
+
+  it('does not offer to create an exercise that already has that name', async () => {
+    await search('goblet SQUAT');
+
+    expect(optionNames()).toEqual([gobletSquat.name]);
+    expect(createLink()).toBeNull();
+  });
+
+  it('finds the exercises the user created', async () => {
+    const beltSquat = { ...squat, id: 'created', name: 'Belt Squat' };
+    await db.exercises.add(beltSquat);
+
+    await vi.waitFor(async () => {
+      await search('belt');
+      expect(optionNames()).toEqual([beltSquat.name]);
+    });
   });
 
   it("hides exercises that are already in today's list", async () => {
@@ -139,11 +191,17 @@ describe('AddExercise', () => {
     });
 
     it('hides the exercises already in that session', () => {
-      expect(optionNames()).toEqual([bench.name, pullups.name, gobletSquat.name]);
+      expect(optionNames()).toEqual([bench.name, pullups.name, gobletSquat.name, frontSquat.name]);
     });
 
     it('goes back to that session', () => {
       expect(element().querySelector('a')?.getAttribute('href')).toBe('/history/1');
+    });
+
+    it('creates exercises for that session', async () => {
+      await search('Belt squat');
+
+      expect(createLink()?.getAttribute('href')).toBe('/history/1/add/new?name=Belt%20squat');
     });
 
     it('adds the picked exercise to that session and goes back to it', async () => {

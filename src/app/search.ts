@@ -8,10 +8,15 @@ const words = (text: string): string[] =>
     .split(/[^\p{L}\p{N}]+/u)
     .filter(Boolean);
 
+const startsAWord = (nameWords: string[]) => (queryWord: string) =>
+  nameWords.some((nameWord) => nameWord.startsWith(queryWord));
+
 // True when every word of the query starts some word of the name, in any order.
 export function matchesSearch(name: string, query: string): boolean {
-  const nameWords = words(name);
-  return words(query).every((queryWord) =>
-    nameWords.some((nameWord) => nameWord.startsWith(queryWord)),
-  );
+  return words(query).every(startsAWord(words(name)));
+}
+
+// True when at least one word of the query starts some word of the name: a close match.
+export function matchesSomeWord(name: string, query: string): boolean {
+  return words(query).some(startsAWord(words(name)));
 }

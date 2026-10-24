@@ -6,6 +6,11 @@ export const routes: Routes = [
   { path: '', component: Today, title: 'Today' },
   { path: 'add', component: AddExercise, title: 'Add exercise' },
   {
+    path: 'add/new',
+    loadComponent: () => import('./new-exercise/new-exercise').then((m) => m.NewExercise),
+    title: 'New exercise',
+  },
+  {
     path: 'lift/:id',
     loadComponent: () => import('./lift/lift').then((m) => m.LiftScreen),
     title: 'Lift',
@@ -21,5 +26,10 @@ export const routes: Routes = [
     title: 'Session',
   },
   { path: 'history/:id/add', component: AddExercise, title: 'Add exercise' },
+  {
+    path: 'history/:id/add/new',
+    loadComponent: () => import('./new-exercise/new-exercise').then((m) => m.NewExercise),
+    title: 'New exercise',
+  },
   { path: '**', redirectTo: '' },
 ];

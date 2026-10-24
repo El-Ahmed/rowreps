@@ -62,3 +62,18 @@ h2 {
   font: var(--tui-typography-body-m);
   color: var(--tui-text-secondary);
 }
+
+/* Below the few results there are, or right under the hint when there are none. */
+.create {
+  margin-block-start: 1.5rem;
+}
+
+.hint + .create {
+  margin-block-start: 0;
+}
+
+.chevron {
+  flex-shrink: 0;
+  margin-inline-start: auto;
+  color: var(--tui-text-secondary);
+}

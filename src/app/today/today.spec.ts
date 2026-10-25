@@ -74,8 +74,9 @@ describe('Today', () => {
     expect(button('Edit')).toBeUndefined();
   });
 
-  it('links to the history', () => {
+  it('links to the history and the settings', () => {
     expect(element().querySelector('a[href="/history"]')?.textContent).toContain('History');
+    expect(element().querySelector('a[href="/settings"]')?.textContent).toContain('Settings');
   });
 
   it("lists today's saved exercises in order", async () => {

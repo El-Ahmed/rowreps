@@ -59,7 +59,7 @@ const cell = (value: string | number) => {
   return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 };
 
-// One row per set, oldest first. A lift with no sets still gets a row, and its note is on its first row.
+// One row per set, oldest first, each with its lift's note. A lift with no sets still gets a row.
 export function spreadsheet(sessions: Session[]): string {
   const rows = [...sessions]
     .sort((a, b) => a.date.localeCompare(b.date))
@@ -74,7 +74,7 @@ export function spreadsheet(sessions: Session[]): string {
           set ? index + 1 : '',
           set?.weight ?? '',
           set?.reps ?? '',
-          index === 0 ? (lift.note ?? '') : '',
+          lift.note ?? '',
         ]);
       }),
     );

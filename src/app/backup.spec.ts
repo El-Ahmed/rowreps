@@ -97,7 +97,7 @@ describe('backup', () => {
     expect(spreadsheet(sessions).split('\r\n')).toEqual([
       'Date,Exercise,Primary muscles,Secondary muscles,Set,Weight,Reps,Note',
       `2026-10-19,${bench.name},chest,"shoulders, triceps",1,60,8,"Felt ""heavy"", go slower"`,
-      `2026-10-19,${bench.name},chest,"shoulders, triceps",2,62.5,6,`,
+      `2026-10-19,${bench.name},chest,"shoulders, triceps",2,62.5,6,"Felt ""heavy"", go slower"`,
       '2026-10-21,Pullups,lats,"biceps, middle back",,,,Too tired',
     ]);
   });

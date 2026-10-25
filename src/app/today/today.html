@@ -15,6 +15,16 @@
     @if (!editing()) {
       <a
         tuiIconButton
+        routerLink="/settings"
+        appearance="secondary-grayscale"
+        iconStart="@tui.sliders-horizontal"
+        size="m"
+        class="round"
+      >
+        Settings
+      </a>
+      <a
+        tuiIconButton
         routerLink="/history"
         appearance="secondary-grayscale"
         iconStart="@tui.history"

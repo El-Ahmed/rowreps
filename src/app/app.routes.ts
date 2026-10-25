@@ -31,5 +31,10 @@ export const routes: Routes = [
     loadComponent: () => import('./new-exercise/new-exercise').then((m) => m.NewExercise),
     title: 'New exercise',
   },
+  {
+    path: 'settings',
+    loadComponent: () => import('./settings/settings').then((m) => m.Settings),
+    title: 'Settings',
+  },
   { path: '**', redirectTo: '' },
 ];

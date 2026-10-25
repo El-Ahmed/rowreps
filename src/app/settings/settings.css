@@ -1,0 +1,104 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  block-size: 3.5rem;
+}
+
+.round {
+  border-radius: 100%;
+}
+
+.round::before {
+  font-size: 1.25rem;
+}
+
+h1 {
+  margin: 0.5rem 0 0;
+  font: var(--tui-typography-heading-h4);
+}
+
+h2 {
+  margin: 1.5rem 0 0.5rem;
+  padding-inline: 0.5rem;
+  font: var(--tui-typography-body-s);
+  font-weight: 700;
+  color: var(--tui-text-secondary);
+}
+
+.card {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: 1.5rem;
+  background: var(--tui-background-base-alt);
+  overflow: hidden;
+}
+
+.card > * + * {
+  border-block-start: 1px solid var(--tui-border-normal);
+}
+
+.row {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: 4.5rem;
+  padding-inline: 1.25rem;
+}
+
+/* White icons on a raised circle, as in the design. */
+[tuiAvatar] {
+  background: var(--tui-background-neutral-1);
+  color: var(--tui-text-primary);
+}
+
+[tuiTitle] {
+  min-inline-size: 0;
+  font: var(--tui-typography-ui-l);
+  font-weight: 600;
+}
+
+[tuiSubtitle] {
+  font: var(--tui-typography-body-s);
+}
+
+.chevron {
+  flex-shrink: 0;
+  margin-inline-start: auto;
+  color: var(--tui-text-secondary);
+}
+
+/* Export sheet */
+
+.since {
+  margin: 0 0 1rem;
+  font: var(--tui-typography-body-m);
+  color: var(--tui-text-secondary);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.option {
+  border-radius: 1rem;
+  background: var(--tui-background-neutral-1);
+}
+
+.option [tuiAvatar] {
+  background: var(--tui-background-base-alt);
+}
+
+.cancel {
+  inline-size: 100%;
+  margin-block-start: 0.5rem;
+}
+
+/* Restore alert */
+
+.restore {
+  margin: 0 0 0.5rem;
+  font: var(--tui-typography-body-m);
+  color: var(--tui-text-secondary);
+}

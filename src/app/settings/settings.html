@@ -1,0 +1,78 @@
+<main class="screen">
+  <div class="toolbar">
+    <a
+      tuiIconButton
+      routerLink="/"
+      appearance="secondary-grayscale"
+      iconStart="@tui.chevron-left"
+      size="m"
+      class="round"
+    >
+      Back
+    </a>
+  </div>
+
+  <h1>Settings</h1>
+
+  <h2>Your data</h2>
+  <ul class="card">
+    <li>
+      <button tuiCell type="button" class="row" [disabled]="!count()" (click)="exporting.set(true)">
+        <span tuiAvatar="@tui.download" appearance="secondary" size="s"></span>
+        <span tuiTitle>
+          Export workouts
+          <span tuiSubtitle>Download a file of every workout</span>
+        </span>
+        <tui-icon icon="@tui.chevron-right" class="chevron" />
+      </button>
+    </li>
+    <li>
+      <button tuiCell type="button" class="row" (click)="file.click()">
+        <span tuiAvatar="@tui.upload" appearance="secondary" size="s"></span>
+        <span tuiTitle>
+          Restore from file
+          <span tuiSubtitle>Bring back workouts from a backup file (.json)</span>
+        </span>
+        <tui-icon icon="@tui.chevron-right" class="chevron" />
+      </button>
+      <input #file type="file" accept=".json,application/json" hidden (change)="pick(file)" />
+    </li>
+  </ul>
+</main>
+
+<ng-template [(tuiSheetDialog)]="exporting" [tuiSheetDialogOptions]="{ label: 'Export workouts' }">
+  @if (firstDate(); as first) {
+    <p class="since">{{ count() | i18nPlural: workouts }} since {{ first | date: 'EEE d MMM' }}</p>
+  }
+  <div class="options">
+    <button tuiCell type="button" class="row option" (click)="exportBackup()">
+      <span tuiAvatar="@tui.file" appearance="secondary" size="s"></span>
+      <span tuiTitle>
+        Backup file
+        <span tuiSubtitle>To restore into RowReps later · .json</span>
+      </span>
+      <tui-icon icon="@tui.chevron-right" class="chevron" />
+    </button>
+    <button tuiCell type="button" class="row option" (click)="exportSpreadsheet()">
+      <span tuiAvatar="@tui.sheet" appearance="secondary" size="s"></span>
+      <span tuiTitle>
+        Spreadsheet
+        <span tuiSubtitle>To view in Excel or Google Sheets · .csv · can't be restored</span>
+      </span>
+      <tui-icon icon="@tui.chevron-right" class="chevron" />
+    </button>
+  </div>
+  <button tuiButton type="button" appearance="flat" class="cancel" (click)="exporting.set(false)">
+    Cancel
+  </button>
+</ng-template>
+
+<ng-template #restoreText>
+  <p class="restore">From {{ restoring().file }}</p>
+  <p class="restore">
+    {{ restoring().added | i18nPlural: newDays }} will be added.
+    @if (restoring().kept) {
+      {{ restoring().kept | i18nPlural: kept }}
+    }
+  </p>
+</ng-template>

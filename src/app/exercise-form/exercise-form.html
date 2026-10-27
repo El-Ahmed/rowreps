@@ -1,0 +1,45 @@
+<tui-textfield class="name">
+  <label tuiLabel for="exercise-name">Name</label>
+  <input id="exercise-name" tuiInput type="text" [(ngModel)]="name" />
+</tui-textfield>
+<tui-error class="error" [error]="nameError()" />
+
+<h2 id="group-label">Muscle group</h2>
+<div role="radiogroup" aria-labelledby="group-label" class="groups">
+  @for (item of groups; track item.name) {
+    <label tuiBlock="m" class="option">
+      <input
+        tuiBlock
+        type="radio"
+        name="group"
+        [checked]="group() === item"
+        (change)="pick(item)"
+        appearance="secondary-grayscale"
+      />
+      {{ item.name }}
+    </label>
+  }
+</div>
+
+@if (group(); as group) {
+  @if (group.muscles.length > 1) {
+    <h2 id="muscles-label">Muscles worked</h2>
+    <div role="group" aria-labelledby="muscles-label" class="muscles">
+      @for (muscle of group.muscles; track muscle) {
+        <label tuiBlock="s" class="option">
+          <input
+            tuiBlock
+            type="checkbox"
+            [checked]="muscles().includes(muscle)"
+            (change)="toggle(muscle)"
+            appearance="secondary-grayscale"
+          />
+          @if (muscles().includes(muscle)) {
+            <tui-icon icon="@tui.check" />
+          }
+          {{ capitalize(muscle) }}
+        </label>
+      }
+    </div>
+  }
+}

@@ -1,0 +1,40 @@
+<main class="screen">
+  <div class="toolbar">
+    <button
+      tuiIconButton
+      type="button"
+      appearance="secondary-grayscale"
+      iconStart="@tui.chevron-left"
+      size="m"
+      class="back"
+      (click)="back()"
+    >
+      Back
+    </button>
+  </div>
+
+  <h1>Edit exercise</h1>
+  <p class="hint">Changes it in all your workouts, past ones too.</p>
+
+  @if (exercise()) {
+    <app-exercise-form [(name)]="name" [(muscles)]="muscles" [nameError]="nameError()" />
+
+    <div class="actions">
+      <button tuiButton type="button" size="l" class="main" [disabled]="!valid()" (click)="save()">
+        Save
+      </button>
+      @if (edited()) {
+        <button
+          tuiButton
+          type="button"
+          appearance="flat-grayscale"
+          size="l"
+          iconStart="@tui.rotate-ccw"
+          (click)="reset()"
+        >
+          Reset to original
+        </button>
+      }
+    </div>
+  }
+</main>

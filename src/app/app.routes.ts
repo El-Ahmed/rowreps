@@ -16,6 +16,11 @@ export const routes: Routes = [
     title: 'Lift',
   },
   {
+    path: 'exercise/:id',
+    loadComponent: () => import('./edit-exercise/edit-exercise').then((m) => m.EditExercise),
+    title: 'Edit exercise',
+  },
+  {
     path: 'history',
     loadComponent: () => import('./history/history').then((m) => m.SessionHistory),
     title: 'History',

@@ -2,6 +2,7 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { RouterLink } from '@angular/router';
 import { TuiAxes } from '@taiga-ui/addon-charts/components/axes';
 import { TuiLineChart } from '@taiga-ui/addon-charts/components/line-chart';
 import { TUI_PLATFORM } from '@taiga-ui/cdk';
@@ -22,7 +23,7 @@ const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1
 // The sheet a lift opens from its toolbar: how to do the exercise, and its progress so far.
 @Component({
   selector: 'app-lift-sheet',
-  imports: [DatePipe, MuscleFigure, TuiAxes, TuiButton, TuiLineChart, TuiSegmented],
+  imports: [DatePipe, MuscleFigure, RouterLink, TuiAxes, TuiButton, TuiLineChart, TuiSegmented],
   templateUrl: './lift-sheet.html',
   styleUrl: './lift-sheet.css',
 })

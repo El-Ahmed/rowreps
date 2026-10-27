@@ -77,11 +77,14 @@ export class EditExercise {
       .subscribe(() => this.location.back());
   }
 
+  // Saves only the fields the app uses, even for a free-exercise-db exercise.
   protected async save(): Promise<void> {
+    const { id, secondaryMuscles } = this.exercise()!;
     await this.exercises.update({
-      ...this.exercise()!,
+      id,
       name: this.name().trim(),
       primaryMuscles: this.muscles(),
+      secondaryMuscles,
     });
     this.location.back();
   }

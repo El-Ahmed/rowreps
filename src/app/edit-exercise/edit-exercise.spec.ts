@@ -61,7 +61,7 @@ describe('EditExercise', () => {
     await render();
     TestBed.inject(HttpTestingController)
       .expectOne('free-exercise-db/exercises.json')
-      .flush([bench, squat]);
+      .flush([{ ...bench, instructions: ['Lie back on a flat bench.'] }, squat]);
     await vi.waitFor(async () => {
       await render();
       expect(nameInput()).not.toBeNull();
@@ -88,7 +88,7 @@ describe('EditExercise', () => {
     expect(button('Reset to original')).toBeUndefined();
   });
 
-  it('saves a free-exercise-db exercise as the user’s own, in past workouts too', async () => {
+  it('saves a free-exercise-db exercise as the user’s own, with only the fields the app uses', async () => {
     await open(bench.id);
     await rename('Flat bench ');
     option('Arms').click();

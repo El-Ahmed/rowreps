@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, linkedSignal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
@@ -35,8 +35,8 @@ export class LiftSheet {
   readonly lift = input.required<Lift>();
 
   protected readonly history = computed(() => this.sessions.history(this.lift().id));
-  // 0 is How to, 1 is Progress. It opens on Progress once the lift has been logged.
-  protected readonly tab = linkedSignal(() => (this.history().length ? 1 : 0));
+  // 0 is How to, 1 is Progress. It always opens on How to.
+  protected readonly tab = signal(0);
 
   protected readonly primary = computed(() =>
     this.lift().primaryMuscles.map(capitalize).join(', '),

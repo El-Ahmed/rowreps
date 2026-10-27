@@ -15,6 +15,30 @@ h3 {
   flex: 1 1 0;
 }
 
+/* The sheet's title, with the edit button beside it. Stays at the top like Taiga's sheet header. */
+.header {
+  position: sticky;
+  z-index: 1;
+  inset-block-start: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-inline: -1rem;
+  padding: 0.75rem 1rem;
+  background: var(--tui-background-elevation-1);
+}
+
+.header h2 {
+  margin: 0;
+  font: var(--tui-typography-heading-h5);
+}
+
+.edit {
+  flex-shrink: 0;
+  border-radius: 100%;
+}
+
 .secondary {
   color: var(--tui-text-secondary);
 }

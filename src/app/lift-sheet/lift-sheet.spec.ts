@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TUI_PLATFORM } from '@taiga-ui/cdk';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
 import { WorkSet, db } from '../db';
 import { Exercise } from '../exercises';
 import { Sessions } from '../sessions';
@@ -57,6 +58,7 @@ describe('LiftSheet', () => {
     platform = 'web';
     TestBed.configureTestingModule({
       providers: [
+        provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: TUI_PLATFORM, useFactory: () => platform },
@@ -74,8 +76,17 @@ describe('LiftSheet', () => {
       expect(element().querySelectorAll('.primary').length).toBe(2);
     });
 
+    it('links to editing the exercise', () => {
+      expect(element().querySelector('h2')?.textContent).toBe(bench.name);
+      expect(element().querySelector('header a')?.getAttribute('href')).toBe(
+        '/exercise/Barbell_Bench_Press_-_Medium_Grip',
+      );
+    });
+
     it('links to video searches for the exercise', () => {
-      const links = [...element().querySelectorAll('a')].map((a) => a.href);
+      const links = [...element().querySelectorAll('section a')].map(
+        (a) => (a as HTMLAnchorElement).href,
+      );
       expect(links).toEqual([
         'https://www.youtube.com/results?search_query=Barbell%20Bench%20Press%20-%20Medium%20Grip%20proper%20form',
         'https://www.tiktok.com/search?q=Barbell%20Bench%20Press%20-%20Medium%20Grip%20form',

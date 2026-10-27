@@ -1,3 +1,17 @@
+<header class="header">
+  <h2>{{ lift().name }}</h2>
+  <a
+    tuiIconButton
+    appearance="secondary-grayscale"
+    iconStart="@tui.pencil"
+    size="m"
+    class="edit"
+    [routerLink]="['/exercise', lift().id]"
+  >
+    Edit exercise
+  </a>
+</header>
+
 <tui-segmented size="l" class="tabs" [(activeItemIndex)]="tab">
   <button type="button">How to</button>
   <button type="button">Progress</button>

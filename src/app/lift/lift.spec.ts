@@ -92,8 +92,8 @@ describe('LiftScreen', () => {
       expect(button('Log set')?.disabled).toBe(true);
     });
 
-    it('has a button for its progress and how to', () => {
-      expect(button(`${bench.name}: progress and how to`)).toBeDefined();
+    it('has its name as a button for how to and progress', () => {
+      expect(button(`${bench.name}: how to and progress`)?.textContent).toContain(bench.name);
     });
 
     it('logs the typed set and starts the rest', async () => {

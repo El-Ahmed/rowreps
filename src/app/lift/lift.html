@@ -15,9 +15,9 @@
           Back
         </a>
       }
-      <h1>{{ lift.name }}</h1>
       @switch (mode()) {
         @case ('sets') {
+          <h1>{{ lift.name }}</h1>
           <button
             tuiButton
             type="button"
@@ -30,6 +30,7 @@
           </button>
         }
         @case ('note') {
+          <h1>{{ lift.name }}</h1>
           <button
             tuiButton
             type="button"
@@ -43,17 +44,18 @@
         }
         @default {
           <button
-            tuiIconButton
+            tuiButton
             type="button"
             appearance="secondary-grayscale"
-            iconStart="@tui.trending-up"
+            iconEnd="@tui.chevron-down"
             size="m"
-            class="round"
-            [attr.aria-label]="lift.name + ': progress and how to'"
+            class="pill name"
+            [attr.aria-label]="lift.name + ': how to and progress'"
             (click)="sheetOpen.set(true)"
           >
-            Progress and how to
+            <span class="name-text">{{ lift.name }}</span>
           </button>
+          <span class="spacer"></span>
         }
       }
     </div>

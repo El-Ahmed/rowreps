@@ -28,11 +28,21 @@
   inline-size: 2.75rem;
 }
 
-h1 {
+/* The lift's name, shrunk to fit between the toolbar's buttons. */
+.name {
+  flex-shrink: 1;
+}
+
+h1,
+.name-text {
   margin: 0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+h1,
+.name {
   font: var(--tui-typography-ui-l);
   font-weight: 600;
 }

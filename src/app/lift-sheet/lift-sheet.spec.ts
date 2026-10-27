@@ -119,7 +119,14 @@ describe('LiftSheet', () => {
       await open(3);
     });
 
-    it('opens on progress: the heaviest set gained, charted, and each session', () => {
+    it('opens on how to', () => {
+      expect(text()).toContain('How to do it');
+      expect(text()).not.toContain('in 2 sessions');
+    });
+
+    it('switches to progress: the heaviest set gained, charted, and each session', async () => {
+      tab('Progress').click();
+      await render();
       expect(text()).toContain('+5 kg in 2 sessions');
       expect(element().querySelector('tui-line-chart')?.getAttribute('aria-label')).toBe(
         'Heaviest set per session: 80, 85 kg',
@@ -128,13 +135,6 @@ describe('LiftSheet', () => {
         'Mon 12 Oct Chest up 82.5 × 8 · 85 × 5',
         'Mon 5 Oct 80 × 8 · 80 × 8',
       ]);
-    });
-
-    it('switches to how to', async () => {
-      tab('How to').click();
-      await render();
-      expect(text()).toContain('How to do it');
-      expect(text()).not.toContain('in 2 sessions');
     });
   });
 });

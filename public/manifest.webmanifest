@@ -1,0 +1,14 @@
+{
+  "name": "RowReps",
+  "short_name": "RowReps",
+  "description": "Log a lift in a few taps. Next time, RowReps shows what you lifted last time, so you know what to beat.",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#222222",
+  "background_color": "#222222",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

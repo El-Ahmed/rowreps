@@ -3,7 +3,10 @@
   "compatibility_date": "2026-10-01",
   "assets": {
     "directory": "./dist/rowreps/browser",
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "single-page-application",
   },
-  "previews": {}
+  "previews": {},
+  "env": {
+    "dev": {},
+  },
 }

@@ -1,3 +1,8 @@
+/* Full height, so the install line sits at the bottom. */
+.screen {
+  min-block-size: 100dvh;
+}
+
 .toolbar {
   display: flex;
   justify-content: flex-end;
@@ -101,7 +106,7 @@ h1 {
 .add {
   justify-content: flex-start;
   inline-size: 100%;
-  margin-block-start: 0.75rem;
+  margin-block: 0.75rem 1.5rem;
   padding-inline: 1rem;
   border-radius: 1rem;
   color: var(--tui-text-secondary);
@@ -115,4 +120,98 @@ h1 {
 
 .cdk-drag-placeholder {
   opacity: 0;
+}
+
+/* Workouts restored */
+
+.restored {
+  margin-block-start: 1.25rem;
+  padding: 1.25rem;
+  border-radius: 1.5rem;
+  background: var(--tui-background-base-alt);
+}
+
+.restored-label {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font: var(--tui-typography-body-s);
+  font-weight: 700;
+  color: var(--tui-text-secondary);
+}
+
+.restored-check {
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  border-radius: 100%;
+  background: color-mix(in srgb, var(--tui-background-accent-1) 16%, transparent);
+  color: var(--tui-text-action);
+  font-size: 1rem;
+}
+
+.restored-title {
+  margin: 0.875rem 0 0;
+  font: var(--tui-typography-heading-h5);
+  font-weight: 600;
+}
+
+.restored-text {
+  margin: 0.375rem 0 0;
+  font: var(--tui-typography-body-l);
+  color: var(--tui-text-secondary);
+}
+
+.restored .pill {
+  margin-block-start: 1rem;
+  border-radius: 2rem;
+}
+
+/* Install line and card */
+
+.install {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-block-start: auto;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+  border-radius: 1.5rem;
+  background: var(--tui-background-base-alt);
+}
+
+.install-open {
+  flex: 1;
+  align-items: center;
+  min-inline-size: 0;
+  min-block-size: 4rem;
+  padding: 0;
+  text-align: start;
+}
+
+.install-card {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+  padding: 0.75rem 0.5rem 1rem 1rem;
+}
+
+.install-head {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.install-card > [tuiButton] {
+  margin-inline-end: 0.5rem;
+  border-radius: 1rem;
+}
+
+/* White icons on a raised circle, as in the design. */
+.install [tuiAvatar] {
+  background: var(--tui-background-neutral-1);
+  color: var(--tui-text-primary);
+}
+
+.install [tuiSubtitle] {
+  font: var(--tui-typography-body-s);
 }

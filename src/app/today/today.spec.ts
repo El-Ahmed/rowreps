@@ -1,8 +1,11 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { CdkDropList } from '@angular/cdk/drag-drop';
 import { TuiDay } from '@taiga-ui/cdk';
+import { TuiDialogService, TuiRoot, provideTaiga } from '@taiga-ui/core';
+import { of } from 'rxjs';
 import { db } from '../db';
 import { Exercise } from '../exercises';
 import { Sessions } from '../sessions';
@@ -165,5 +168,158 @@ describe('Today', () => {
       expect(button('Edit')).toBeDefined();
       expect(button(`Remove ${bench.name}`)).toBeUndefined();
     });
+  });
+});
+
+// The install sheet opens inside tui-root, so these tests render Today in one.
+@Component({
+  imports: [TuiRoot, Today],
+  template: '<tui-root><app-today /></tui-root>',
+})
+class Host {}
+
+describe('Today, asking to install', () => {
+  const iphone =
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
+  const pullups: Exercise = {
+    id: 'Pullups',
+    name: 'Pullups',
+    primaryMuscles: ['lats'],
+    secondaryMuscles: ['biceps', 'middle back'],
+  };
+  let fixture: ComponentFixture<Host>;
+
+  const page = () => document.body.textContent?.replace(/\s+/g, ' ') ?? '';
+  const button = (text: string) =>
+    [...document.body.querySelectorAll('button')].find((b) =>
+      b.textContent?.trim().startsWith(text),
+    );
+
+  function configure(): void {
+    TestBed.configureTestingModule({ providers: [provideRouter([]), provideTaiga()] });
+  }
+
+  async function open(): Promise<void> {
+    fixture = TestBed.createComponent(Host);
+    await shows('What are you lifting today?');
+  }
+
+  // Closes the app and starts it again.
+  function restart(): void {
+    fixture.destroy();
+    TestBed.resetTestingModule();
+    configure();
+  }
+
+  async function shows(content: string): Promise<void> {
+    await vi.waitFor(async () => {
+      fixture.detectChanges();
+      await fixture.whenStable();
+      expect(page()).toContain(content);
+    });
+  }
+
+  async function settle(): Promise<void> {
+    fixture.detectChanges();
+    await fixture.whenStable();
+  }
+
+  // A set of pull-ups logged on a day before today.
+  function workedOut(): Promise<number> {
+    return db.sessions.add({
+      date: '2026-01-05',
+      exercises: [{ ...pullups, sets: [{ weight: 0, reps: 10 }] }],
+    });
+  }
+
+  beforeEach(configure);
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    delete (navigator as { standalone?: boolean }).standalone;
+  });
+
+  describe('in iPhone Safari', () => {
+    beforeEach(() => {
+      vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue(iphone);
+    });
+
+    it('shows the Add to Home Screen line, which opens the steps', async () => {
+      await open();
+      await shows('Opens like an app and keeps your workouts safe');
+
+      button('Add to Home Screen')?.click();
+
+      await shows("Tap Share In Safari's toolbar");
+    });
+
+    it('hides the line for good once closed', async () => {
+      await open();
+      await shows('Add to Home Screen');
+
+      button('Not now')?.click();
+      await settle();
+      expect(page()).not.toContain('Add to Home Screen');
+
+      restart();
+      await open();
+      expect(page()).not.toContain('Add to Home Screen');
+    });
+
+    it('asks to save the workouts and add it, on a day after the first workout', async () => {
+      await workedOut();
+      await open();
+
+      await shows('Keep your workouts safe');
+      expect(page()).toContain('Save workouts file');
+      expect(page()).not.toContain('Opens like an app');
+    });
+
+    it('asks only once', async () => {
+      await workedOut();
+      await open();
+      await shows('Keep your workouts safe');
+
+      restart();
+      await open();
+      await settle();
+      expect(page()).not.toContain('Keep your workouts safe');
+    });
+  });
+
+  it('offers to restore in the installed iPhone app, once', async () => {
+    vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue(iphone);
+    Object.defineProperty(navigator, 'standalone', { value: true, configurable: true });
+    const dialog = vi.spyOn(TestBed.inject(TuiDialogService), 'open').mockReturnValue(of(false));
+    await open();
+
+    await vi.waitFor(() =>
+      expect(dialog).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ label: 'Logged workouts in Safari?' }),
+      ),
+    );
+    expect(page()).not.toContain('Add to Home Screen');
+
+    restart();
+    const again = vi.spyOn(TestBed.inject(TuiDialogService), 'open');
+    await open();
+    await settle();
+    expect(again).not.toHaveBeenCalled();
+  });
+
+  it('shows the install card on Android on a day after the first workout', async () => {
+    const prompt = vi.fn().mockResolvedValue(undefined);
+    await workedOut();
+    await open();
+    expect(page()).not.toContain('Quicker to open at the gym');
+
+    dispatchEvent(Object.assign(new Event('beforeinstallprompt'), { prompt }));
+    await shows('Add RowReps to your home screen Quicker to open at the gym');
+    button('Install')?.click();
+    await settle();
+
+    expect(prompt).toHaveBeenCalled();
+    expect(page()).not.toContain('Quicker to open at the gym');
   });
 });

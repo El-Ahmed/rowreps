@@ -117,6 +117,8 @@ export class LiftScreen {
       weight: this.weight()!,
       reps: this.reps()!,
     });
+    // Asks the browser not to clear the workouts when the phone is short on space.
+    navigator.storage?.persist();
     this.notice.set({ kind: 'logged', index });
     this.resting.set(true);
     this.rest.set(REST_SECONDS);

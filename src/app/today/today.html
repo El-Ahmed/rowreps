@@ -44,6 +44,30 @@
     }
   </header>
 
+  @if (restored()) {
+    <section class="restored" role="status">
+      <p class="restored-label">
+        <tui-icon icon="@tui.check" class="restored-check" />
+        Restored
+      </p>
+      <p class="restored-title">{{ restored() | i18nPlural: restoredText }}</p>
+      <p class="restored-text">
+        From now on, open RowReps from your Home Screen. Safari keeps its own copy, and it won't
+        update.
+      </p>
+      <button
+        tuiButton
+        type="button"
+        appearance="secondary-grayscale"
+        size="m"
+        class="pill"
+        (click)="restored.set(0)"
+      >
+        Got it
+      </button>
+    </section>
+  }
+
   @if (!exercises().length) {
     @if (loaded()) {
       <p class="hint">What are you lifting today?</p>
@@ -105,4 +129,60 @@
       Add exercise
     </a>
   }
+
+  @if (installLine()) {
+    <div class="install">
+      <button tuiCell type="button" class="install-open" (click)="installSheet.set(true)">
+        <span tuiAvatar="@tui.smartphone" appearance="secondary" size="s"></span>
+        <span tuiTitle>
+          Add to Home Screen
+          <span tuiSubtitle>Opens like an app and keeps your workouts safe</span>
+        </span>
+      </button>
+      <button
+        tuiIconButton
+        type="button"
+        appearance="flat-grayscale"
+        iconStart="@tui.x"
+        size="m"
+        class="round"
+        (click)="install.hideLine()"
+      >
+        Not now
+      </button>
+    </div>
+  } @else if (installCard()) {
+    <div class="install install-card">
+      <div class="install-head">
+        <span tuiAvatar="@tui.smartphone" appearance="secondary" size="s"></span>
+        <span tuiTitle>
+          Add RowReps to your home screen
+          <span tuiSubtitle>Quicker to open at the gym</span>
+        </span>
+        <button
+          tuiIconButton
+          type="button"
+          appearance="flat-grayscale"
+          iconStart="@tui.x"
+          size="m"
+          class="round"
+          (click)="installCard.set(false)"
+        >
+          Not now
+        </button>
+      </div>
+      <button
+        tuiButton
+        type="button"
+        appearance="secondary-grayscale"
+        size="m"
+        (click)="installApp()"
+      >
+        Install
+      </button>
+    </div>
+  }
 </main>
+
+<app-restore (restored)="restored.set($event)" />
+<app-install-sheet [(open)]="installSheet" />

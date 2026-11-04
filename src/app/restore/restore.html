@@ -1,0 +1,11 @@
+<input #file type="file" accept=".json,application/json" hidden (change)="pick(file)" />
+
+<ng-template #text>
+  <p class="restore">From {{ restoring().file }}</p>
+  <p class="restore">
+    {{ restoring().added | i18nPlural: newDays }} will be added.
+    @if (restoring().kept) {
+      {{ restoring().kept | i18nPlural: kept }}
+    }
+  </p>
+</ng-template>

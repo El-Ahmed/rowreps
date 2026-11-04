@@ -17,13 +17,14 @@ import { Settings } from './settings';
 })
 class Host {}
 
+const bench: Exercise = {
+  id: 'Barbell_Bench_Press_-_Medium_Grip',
+  name: 'Barbell Bench Press - Medium Grip',
+  primaryMuscles: ['chest'],
+  secondaryMuscles: ['shoulders', 'triceps'],
+};
+
 describe('Settings', () => {
-  const bench: Exercise = {
-    id: 'Barbell_Bench_Press_-_Medium_Grip',
-    name: 'Barbell Bench Press - Medium Grip',
-    primaryMuscles: ['chest'],
-    secondaryMuscles: ['shoulders', 'triceps'],
-  };
   const pullups: Exercise = {
     id: 'Pullups',
     name: 'Pullups',
@@ -142,5 +143,73 @@ describe('Settings', () => {
         size: 's',
       }),
     );
+  });
+
+  it("hides Install app where the browser can't install", () => {
+    expect(page()).not.toContain('Install app');
+  });
+
+  it("opens Android's install dialog from Install app", async () => {
+    const prompt = vi.fn().mockResolvedValue(undefined);
+    dispatchEvent(Object.assign(new Event('beforeinstallprompt'), { prompt }));
+    await shows('Install app Add RowReps to your Home Screen');
+
+    button('Install app')?.click();
+
+    expect(prompt).toHaveBeenCalled();
+  });
+});
+
+describe('Settings in iPhone Safari', () => {
+  let fixture: ComponentFixture<Host>;
+
+  const page = () => document.body.textContent?.replace(/\s+/g, ' ') ?? '';
+  const button = (title: string) =>
+    [...document.body.querySelectorAll('button')].find((b) =>
+      b.textContent?.trim().startsWith(title),
+    );
+
+  async function shows(content: string): Promise<void> {
+    await vi.waitFor(async () => {
+      fixture.detectChanges();
+      await fixture.whenStable();
+      expect(page()).toContain(content);
+    });
+  }
+
+  beforeEach(() => {
+    vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue(
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
+    );
+    TestBed.configureTestingModule({ providers: [provideRouter([]), provideTaiga()] });
+  });
+
+  afterEach(() => vi.restoreAllMocks());
+
+  it('shows how to add it to the Home Screen', async () => {
+    fixture = TestBed.createComponent(Host);
+    await shows('Install app');
+
+    button('Install app')?.click();
+
+    await shows('Tap Add to Home Screen');
+  });
+
+  it('saves the workouts first once something is logged', async () => {
+    await db.sessions.add({
+      date: '2026-10-19',
+      exercises: [{ ...bench, sets: [{ weight: 60, reps: 8 }] }],
+    });
+    fixture = TestBed.createComponent(Host);
+    await vi.waitFor(async () => {
+      fixture.detectChanges();
+      await fixture.whenStable();
+      expect(button('Export workouts')?.disabled).toBe(false);
+    });
+
+    button('Install app')?.click();
+
+    await shows('Keep your workouts safe');
+    expect(page()).toContain('Open it and tap Restore');
   });
 });

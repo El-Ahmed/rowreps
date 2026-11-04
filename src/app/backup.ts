@@ -1,3 +1,4 @@
+import { TuiDay } from '@taiga-ui/cdk';
 import { db, Session } from './db';
 import { Exercise } from './exercises';
 
@@ -13,6 +14,26 @@ export async function backup(): Promise<Backup> {
     sessions: sessions.map(({ date, exercises }) => ({ date, exercises })),
     exercises: await db.exercises.toArray(),
   };
+}
+
+// A file named after the app, what it holds and today's date.
+export function file(name: string, extension: string, type: string, text: string): File {
+  return new File([text], `rowreps-${name}-${TuiDay.currentLocal().toJSON()}.${extension}`, {
+    type,
+  });
+}
+
+export async function backupFile(): Promise<File> {
+  return file('backup', 'json', 'application/json', JSON.stringify(await backup()));
+}
+
+// Saves the file to the phone's downloads.
+export function download(file: File): void {
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(file);
+  link.download = file.name;
+  link.click();
+  URL.revokeObjectURL(link.href);
 }
 
 // The backup in the file, or undefined when the file isn't a RowReps backup.

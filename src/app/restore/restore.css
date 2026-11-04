@@ -1,0 +1,5 @@
+.restore {
+  margin: 0 0 0.5rem;
+  font: var(--tui-typography-body-m);
+  color: var(--tui-text-secondary);
+}

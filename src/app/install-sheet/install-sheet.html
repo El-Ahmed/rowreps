@@ -1,0 +1,70 @@
+<ng-template
+  [(tuiSheetDialog)]="open"
+  [tuiSheetDialogOptions]="{
+    label: logged() ? 'Keep your workouts safe' : 'Add RowReps to your Home Screen',
+  }"
+>
+  @if (logged()) {
+    <p class="text">
+      Safari can clear them if you don't open RowReps for about a week. The Home Screen app keeps
+      them, but it starts empty, so bring them with you.
+    </p>
+    <ol class="steps">
+      <li class="step save">
+        <div class="head">
+          <span class="number">1</span>
+          <span tuiTitle>
+            Save your workouts
+            <span tuiSubtitle>Then choose Save to Files</span>
+          </span>
+        </div>
+        <button tuiButton type="button" size="m" iconStart="@tui.download" (click)="save()">
+          Save workouts file
+        </button>
+      </li>
+      @for (step of moveSteps; track step.title) {
+        <li class="step">
+          <span class="number">{{ $index + 2 }}</span>
+          <span tuiTitle>
+            {{ step.title }}
+            <span tuiSubtitle>{{ step.hint }}</span>
+          </span>
+          <span [tuiAvatar]="step.icon" appearance="secondary" size="s"></span>
+        </li>
+      }
+    </ol>
+    <button
+      tuiButton
+      type="button"
+      appearance="flat-grayscale"
+      class="close"
+      (click)="open.set(false)"
+    >
+      Not now
+    </button>
+  } @else {
+    <p class="text">It opens full screen like an app, and Safari won't clear your workouts.</p>
+    <ol class="steps">
+      @for (step of steps; track step.title) {
+        <li class="step">
+          <span class="number">{{ $index + 1 }}</span>
+          <span tuiTitle>
+            {{ step.title }}
+            <span tuiSubtitle>{{ step.hint }}</span>
+          </span>
+          <span [tuiAvatar]="step.icon" appearance="secondary" size="s"></span>
+        </li>
+      }
+    </ol>
+    <button
+      tuiButton
+      type="button"
+      appearance="secondary-grayscale"
+      size="l"
+      class="close"
+      (click)="open.set(false)"
+    >
+      Got it
+    </button>
+  }
+</ng-template>

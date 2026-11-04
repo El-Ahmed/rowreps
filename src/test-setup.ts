@@ -18,3 +18,15 @@ vi.mock('@taiga-ui/addon-charts/components/line-chart', async () => {
   }
   return { TuiLineChart };
 });
+
+// jsdom has no matchMedia, which the app uses to tell if it was opened from the Home Screen.
+window.matchMedia ??= (media: string) =>
+  ({
+    matches: false,
+    media,
+    addEventListener: () => undefined,
+    removeEventListener: () => undefined,
+  }) as unknown as MediaQueryList;
+
+// Each test starts with nothing remembered, like a dismissed install ask.
+afterEach(() => localStorage.clear());

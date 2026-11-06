@@ -158,6 +158,15 @@ describe('Settings', () => {
 
     expect(prompt).toHaveBeenCalled();
   });
+
+  it("links to the app's code and the exercise data on GitHub", () => {
+    const link = (title: string) =>
+      [...document.body.querySelectorAll('a')].find((a) => a.textContent?.trim().startsWith(title));
+
+    expect(page()).toContain("The app's code is on GitHub · MIT");
+    expect(link('Open source')?.href).toBe('https://github.com/El-Ahmed/rowreps');
+    expect(link('Exercise data')?.href).toBe('https://github.com/yuhonas/free-exercise-db');
+  });
 });
 
 describe('Settings in iPhone Safari', () => {

@@ -21,7 +21,7 @@ npm run build    # output: dist/rowreps/browser
 Cloudflare Workers Builds is connected to this repo and builds on every push. `wrangler.jsonc` serves `dist/rowreps/browser` as static assets.
 
 - `main` → production, served on the custom domain.
-- Any other branch → its own preview URL.
+- `dev` → the only preview. Other branches don't get preview URLs.
 
 Build settings: build command `npm run build`, deploy command `npx wrangler deploy`, non-production deploy command `npx wrangler preview`, root directory `/`.
 
@@ -34,7 +34,3 @@ The exercise list comes from [free-exercise-db](https://github.com/yuhonas/free-
 ```bash
 curl -fsSL https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/dist/exercises.json -o public/free-exercise-db/exercises.json
 ```
-
-## Claude Code
-
-Mention `@claude` in an issue or pull request comment and Claude works on it, pushing to a branch and opening a PR.

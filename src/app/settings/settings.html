@@ -54,6 +54,42 @@
       <app-restore #restore />
     </li>
   </ul>
+
+  <h2>About</h2>
+  <ul class="card">
+    <li>
+      <a
+        tuiCell
+        href="https://github.com/El-Ahmed/rowreps"
+        target="_blank"
+        rel="noopener"
+        class="row"
+      >
+        <span tuiAvatar="@tui.code" appearance="secondary" size="s"></span>
+        <span tuiTitle>
+          Open source
+          <span tuiSubtitle>The app's code is on GitHub · MIT</span>
+        </span>
+        <tui-icon icon="@tui.external-link" class="chevron" />
+      </a>
+    </li>
+    <li>
+      <a
+        tuiCell
+        href="https://github.com/yuhonas/free-exercise-db"
+        target="_blank"
+        rel="noopener"
+        class="row"
+      >
+        <span tuiAvatar="@tui.book" appearance="secondary" size="s"></span>
+        <span tuiTitle>
+          Exercise data
+          <span tuiSubtitle>free-exercise-db · public domain</span>
+        </span>
+        <tui-icon icon="@tui.external-link" class="chevron" />
+      </a>
+    </li>
+  </ul>
 </main>
 
 <ng-template [(tuiSheetDialog)]="exporting" [tuiSheetDialogOptions]="{ label: 'Export workouts' }">

@@ -113,6 +113,42 @@ describe('AddExercise', () => {
     expect(optionNames()).toEqual([bench.name]);
   });
 
+  it('also matches main muscles and their common names', async () => {
+    await search('quads front');
+    expect(optionNames()).toEqual([frontSquat.name]);
+
+    await search('che ben');
+    expect(optionNames()).toEqual([bench.name]);
+  });
+
+  it('ranks exercises found by name above the ones found only by muscle', async () => {
+    // Saved exercises come first, in id order, so Wall Sit is listed before Leg Press.
+    const wallSit = { ...squat, id: 'a', name: 'Wall Sit' };
+    const legPress = { ...squat, id: 'b', name: 'Leg Press' };
+    await db.exercises.bulkAdd([wallSit, legPress]);
+
+    await vi.waitFor(async () => {
+      await search('leg');
+      expect(optionNames()).toEqual([
+        legPress.name,
+        wallSit.name,
+        squat.name,
+        gobletSquat.name,
+        frontSquat.name,
+      ]);
+    });
+  });
+
+  it('finds exercises with no muscle set by name, under Other', async () => {
+    await db.exercises.add({ ...squat, id: 'created', name: 'Belt Squat', primaryMuscles: [] });
+
+    await vi.waitFor(async () => {
+      await search('belt');
+      expect(groups()).toEqual(['Other']);
+      expect(optionNames()).toEqual(['Belt Squat']);
+    });
+  });
+
   const createLink = () => element().querySelector<HTMLAnchorElement>('a[tuiCell]');
 
   it('says so when nothing matches, and offers to create it', async () => {

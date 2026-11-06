@@ -6,7 +6,7 @@ import { TuiAutoFocus, TuiDay } from '@taiga-ui/cdk';
 import { TuiButton, TuiCell, TuiIcon, TuiInput, TuiTitle } from '@taiga-ui/core';
 import { TuiAvatar } from '@taiga-ui/kit';
 import { Exercise, Exercises } from '../exercises';
-import { matchesSearch, matchesSomeWord } from '../search';
+import { matchesSomeWord, search, searchable } from '../search';
 import { Sessions } from '../sessions';
 
 // Below this many results, the search also offers to create the exercise.
@@ -17,7 +17,8 @@ const CLOSE_MATCHES = 5;
 const SUGGESTIONS = 7;
 
 const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
-const muscleGroup = (exercise: Exercise) => capitalize(exercise.primaryMuscles[0]);
+// Exercises with no muscle set go under "Other".
+const muscleGroup = (exercise: Exercise) => capitalize(exercise.primaryMuscles[0] ?? 'other');
 
 @Component({
   selector: 'app-add-exercise',
@@ -71,9 +72,9 @@ export class AddExercise {
   private readonly optionsById = computed(
     () => new Map(this.options().map((exercise) => [exercise.id, exercise])),
   );
-  private readonly matches = computed(() =>
-    this.options().filter((exercise) => matchesSearch(exercise.name, this.query())),
-  );
+  // The options with their words, worked out when the options change rather than on every keystroke.
+  private readonly searchable = computed(() => this.options().map(searchable));
+  private readonly matches = computed(() => search(this.searchable(), this.query()));
 
   protected readonly groups = computed(() => {
     const matches = this.matches();
@@ -99,9 +100,10 @@ export class AddExercise {
   protected readonly closeMatches = computed(() =>
     this.matches().length
       ? []
-      : this.options()
-          .filter((exercise) => matchesSomeWord(exercise.name, this.query()))
-          .slice(0, CLOSE_MATCHES),
+      : this.searchable()
+          .filter((item) => matchesSomeWord(item, this.query()))
+          .slice(0, CLOSE_MATCHES)
+          .map(({ exercise }) => exercise),
   );
 
   // Before any search: what was done the last time each of the session's exercises was done,

@@ -14,6 +14,22 @@
 
   <h1>Settings</h1>
 
+  @if (install.canInstall()) {
+    <h2>App</h2>
+    <ul class="card">
+      <li>
+        <button tuiCell type="button" class="row" (click)="installApp()">
+          <span tuiAvatar="@tui.smartphone" appearance="secondary" size="s"></span>
+          <span tuiTitle>
+            Install app
+            <span tuiSubtitle>Add RowReps to your Home Screen</span>
+          </span>
+          <tui-icon icon="@tui.chevron-right" class="chevron" />
+        </button>
+      </li>
+    </ul>
+  }
+
   <h2>Your data</h2>
   <ul class="card">
     <li>
@@ -27,7 +43,7 @@
       </button>
     </li>
     <li>
-      <button tuiCell type="button" class="row" (click)="file.click()">
+      <button tuiCell type="button" class="row" (click)="restore.open()">
         <span tuiAvatar="@tui.upload" appearance="secondary" size="s"></span>
         <span tuiTitle>
           Restore from file
@@ -35,7 +51,43 @@
         </span>
         <tui-icon icon="@tui.chevron-right" class="chevron" />
       </button>
-      <input #file type="file" accept=".json,application/json" hidden (change)="pick(file)" />
+      <app-restore #restore />
+    </li>
+  </ul>
+
+  <h2>About</h2>
+  <ul class="card">
+    <li>
+      <a
+        tuiCell
+        href="https://github.com/El-Ahmed/rowreps"
+        target="_blank"
+        rel="noopener"
+        class="row"
+      >
+        <span tuiAvatar="@tui.code" appearance="secondary" size="s"></span>
+        <span tuiTitle>
+          Open source
+          <span tuiSubtitle>The app's code is on GitHub · MIT</span>
+        </span>
+        <tui-icon icon="@tui.external-link" class="chevron" />
+      </a>
+    </li>
+    <li>
+      <a
+        tuiCell
+        href="https://github.com/yuhonas/free-exercise-db"
+        target="_blank"
+        rel="noopener"
+        class="row"
+      >
+        <span tuiAvatar="@tui.book" appearance="secondary" size="s"></span>
+        <span tuiTitle>
+          Exercise data
+          <span tuiSubtitle>free-exercise-db · public domain</span>
+        </span>
+        <tui-icon icon="@tui.external-link" class="chevron" />
+      </a>
     </li>
   </ul>
 </main>
@@ -67,12 +119,4 @@
   </button>
 </ng-template>
 
-<ng-template #restoreText>
-  <p class="restore">From {{ restoring().file }}</p>
-  <p class="restore">
-    {{ restoring().added | i18nPlural: newDays }} will be added.
-    @if (restoring().kept) {
-      {{ restoring().kept | i18nPlural: kept }}
-    }
-  </p>
-</ng-template>
+<app-install-sheet [(open)]="installing" />

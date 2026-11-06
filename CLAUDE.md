@@ -8,4 +8,4 @@
 - Run build, lint and tests before saying a task is done.
 
 # Workflow
-- Never commit or push to `main`. Work on a `feature/<name>` or `fix/<name>` branch and open a pull request into `main`.
+- Never commit or push to `main` or `dev`. Work on a `feature/<name>` or `fix/<name>` branch and open a pull request into `dev`.

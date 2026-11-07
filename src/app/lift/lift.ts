@@ -10,6 +10,7 @@ import { TuiSheetDialog, TuiSwipeActions } from '@taiga-ui/addon-mobile';
 import { interval } from 'rxjs';
 import { WorkSet } from '../db';
 import { LiftSheet } from '../lift-sheet/lift-sheet';
+import { RestTimers } from '../rest-timers';
 import { Sessions } from '../sessions';
 
 // How long the rest after a set starts at, and how much a tap on the timer adds.
@@ -41,6 +42,7 @@ type Notice = { kind: 'logged'; index: number } | { kind: 'deleted'; index: numb
 })
 export class LiftScreen {
   private readonly sessions = inject(Sessions);
+  private readonly restTimers = inject(RestTimers);
   private readonly router = inject(Router);
   private readonly date = TuiDay.currentLocal().toJSON();
 
@@ -87,10 +89,14 @@ export class LiftScreen {
     return notice?.kind === 'logged' ? this.compare(notice.index) : '';
   });
 
-  // The rest timer only shows once a set has been logged on this screen.
-  protected readonly resting = signal(false);
-  protected readonly rest = signal(0);
-  protected readonly restTotal = signal(REST_SECONDS);
+  // The rest timer shows once a set has been logged, and stays when leaving the lift and coming back.
+  private readonly now = signal(Date.now());
+  private readonly timer = computed(() => this.restTimers.byLift()[this.id()]);
+  protected readonly resting = computed(() => !!this.timer());
+  protected readonly rest = computed(() =>
+    Math.max(0, Math.ceil(((this.timer()?.end ?? 0) - this.now()) / 1000)),
+  );
+  protected readonly restTotal = computed(() => this.timer()?.total ?? REST_SECONDS);
 
   protected readonly drafts = signal<WorkSet[]>([]);
   protected readonly note = signal('');
@@ -101,7 +107,7 @@ export class LiftScreen {
   constructor() {
     interval(1000)
       .pipe(takeUntilDestroyed())
-      .subscribe(() => this.rest.update((seconds) => Math.max(0, seconds - 1)));
+      .subscribe(() => this.now.set(Date.now()));
 
     // Back to today once the lift is gone, or if it was never on today's list.
     effect(() => {
@@ -120,9 +126,8 @@ export class LiftScreen {
     // Asks the browser not to clear the workouts when the phone is short on space.
     navigator.storage?.persist();
     this.notice.set({ kind: 'logged', index });
-    this.resting.set(true);
-    this.rest.set(REST_SECONDS);
-    this.restTotal.set(REST_SECONDS);
+    this.restTimers.start(this.id(), REST_SECONDS);
+    this.now.set(Date.now());
     this.mode.set('rest');
   }
 
@@ -143,8 +148,7 @@ export class LiftScreen {
   }
 
   protected moreRest(): void {
-    this.rest.update((seconds) => seconds + MORE_REST_SECONDS);
-    this.restTotal.update((total) => Math.max(total, this.rest()));
+    this.restTimers.add(this.id(), MORE_REST_SECONDS);
   }
 
   protected async deleteSet(index: number): Promise<void> {

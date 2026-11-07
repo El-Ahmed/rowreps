@@ -68,7 +68,7 @@ describe('LiftScreen', () => {
   }
 
   beforeEach(() => {
-    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'Date'] });
     TestBed.configureTestingModule({ providers: [provideRouter([])] });
     navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     sessions = TestBed.inject(Sessions);
@@ -216,6 +216,22 @@ describe('LiftScreen', () => {
       expect(left).toMatch(/^1:[23]\d$/);
       const seconds = (clock: string) => Number(clock[0]) * 60 + Number(clock.slice(2));
       expect(seconds(timer().textContent!.match(/\d:\d\d/)![0])).toBe(seconds(left) + 15);
+    });
+
+    it('keeps the rest counting after leaving the lift, and shows it on coming back', async () => {
+      fixture.destroy();
+      vi.advanceTimersByTime(30_000);
+      await open(bench);
+      await shows('New set');
+
+      expect(element().querySelector('.timer')?.textContent).toMatch(/1:[23]\d/);
+
+      fixture.destroy();
+      vi.advanceTimersByTime(120_000);
+      await open(bench);
+      await shows('New set');
+
+      expect(element().querySelector('.timer')?.textContent).toContain('0:00');
     });
 
     it('fixes a logged set in place', async () => {

@@ -135,17 +135,27 @@ describe('LiftSheet', () => {
       expect(text()).not.toContain('in 2 sessions');
     });
 
-    it('switches to progress: the heaviest set gained, charted, and each session', async () => {
+    it('switches to progress: the volume gained, charted, and each session', async () => {
       tab('Progress').click();
       await render();
-      expect(text()).toContain('+5 kg in 2 sessions');
+      expect(text()).toContain('−195 kg in 2 sessions');
       expect(element().querySelector('tui-line-chart')?.getAttribute('aria-label')).toBe(
-        'Heaviest set per session: 80, 85 kg',
+        'Volume per session: 1280, 1085 kg',
       );
       expect(texts('.sessions li')).toEqual([
         'Mon 12 Oct Chest up 82.5 × 8 · 85 × 5',
         'Mon 5 Oct 80 × 8 · 80 × 8',
       ]);
     });
+  });
+
+  it('counts more reps at the same weight as progress', async () => {
+    await log('2026-10-05', { weight: 60, reps: 8 }, { weight: 60, reps: 8 });
+    await log('2026-10-12', { weight: 60, reps: 10 }, { weight: 60, reps: 9 });
+    await log('2026-10-19');
+    await open(3);
+    tab('Progress').click();
+    await render();
+    expect(text()).toContain('+180 kg in 2 sessions');
   });
 });

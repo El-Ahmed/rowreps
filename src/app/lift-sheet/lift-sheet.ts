@@ -62,12 +62,13 @@ export class LiftSheet {
       : `https://www.tiktok.com/search?q=${search}`;
   });
 
-  // The heaviest set of each session, oldest first, as [session, kg] chart points.
+  // The volume of each session (weight × reps of every set, added up), oldest first, as
+  // [session, kg] chart points. Rounded to whole kg, which also drops decimal leftovers.
   protected readonly points = computed(() =>
     this.history()
-      .map(({ lift }) => Math.max(...lift.sets.map((set) => set.weight)))
+      .map(({ lift }) => Math.round(lift.sets.reduce((sum, set) => sum + set.weight * set.reps, 0)))
       .reverse()
-      .map((weight, index) => [index, weight] as const),
+      .map((volume, index) => [index, volume] as const),
   );
   protected readonly gain = computed(() => {
     const points = this.points();
@@ -76,15 +77,15 @@ export class LiftSheet {
   });
   protected readonly chartLabel = computed(
     () =>
-      `Heaviest set per session: ${this.points()
-        .map(([, weight]) => weight)
+      `Volume per session: ${this.points()
+        .map(([, volume]) => volume)
         .join(', ')} kg`,
   );
-  // The chart's weight range, with some room above and below the line.
+  // The chart's volume range, with some room above and below the line.
   protected readonly range = computed(() => {
-    const weights = this.points().map(([, weight]) => weight);
-    const min = Math.min(...weights);
-    const max = Math.max(...weights);
+    const volumes = this.points().map(([, volume]) => volume);
+    const min = Math.min(...volumes);
+    const max = Math.max(...volumes);
     const room = (max - min) / 4 || 2.5;
     return { y: min - room, height: max - min + 2 * room };
   });
